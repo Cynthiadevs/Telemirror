@@ -12,6 +12,38 @@ URL_PATTERN = re.compile(
 
 USERNAME_PATTERN = re.compile(r'(@[a-zA-Z0-9_]{4,32})')
 
+def is_image_message(message: Any) -> bool:
+    """
+    Checks if a message contains an image/photo.
+    Compatible with Telethon Message objects or custom mock structures.
+    """
+    if not message:
+        return False
+    # Check Telethon photo attribute
+    if getattr(message, 'photo', None) is not None:
+        return True
+
+    # Check direct document attribute on message
+    doc = getattr(message, 'document', None)
+    if doc is not None:
+        mime = getattr(doc, 'mime_type', '') or ''
+        if mime.startswith('image/'):
+            return True
+
+    media = getattr(message, 'media', None)
+    if not media:
+        return False
+    media_class = media.__class__.__name__
+    if media_class == 'MessageMediaPhoto':
+        return True
+    if media_class == 'MessageMediaDocument' and hasattr(media, 'document') and media.document:
+        mime = getattr(media.document, 'mime_type', '') or ''
+        if mime.startswith('image/'):
+            return True
+    if getattr(media, 'mime_type', '').startswith('image/'):
+        return True
+    return False
+
 def should_process_message(text: Optional[str], custom_settings: Optional[Dict[str, Any]] = None) -> Tuple[bool, str]:
     """
     Checks whether a message should be processed based on whitelist/blacklist keywords.

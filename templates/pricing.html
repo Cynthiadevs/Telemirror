@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Plans & Pricing • TeleMirror</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#ecfeff', 100: '#cffafe', 400: '#22d3ee', 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="/static/css/theme.css">
+</head>
+<body class="aceternity-bg text-slate-100 flex flex-col min-h-screen">
+
+  <!-- Impersonation Banner -->
+  <div id="impersonationBanner" class="hidden bg-gradient-to-r from-amber-600 to-amber-700 text-black px-4 py-2 text-xs font-bold items-center justify-between z-50">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-user-secret text-sm"></i>
+      <span>ADMIN IMPERSONATION: Viewing as <strong id="impersonatedUserName">User</strong></span>
+    </div>
+    <button onclick="exitImpersonation()" class="px-3 py-1 bg-black text-amber-300 rounded-lg text-xs font-bold hover:bg-slate-900 transition">
+      Exit to Admin View
+    </button>
+  </div>
+
+  <!-- Top Mobile App Header -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <a href="/" class="flex items-center gap-2.5 shrink-0 hover:opacity-90 transition">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-500 to-cyan-400 flex items-center justify-center text-white font-black shadow-md shadow-brand-500/25">
+          <i class="fa-brands fa-telegram text-base"></i>
+        </div>
+        <div class="flex items-center">
+          <span class="text-sm font-extrabold tracking-tight">TeleMirror</span>
+        </div>
+      </a>
+
+      <!-- Right: Compact Control Cluster -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Light/Dark Theme" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-amber-400 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-sun" id="themeToggleIcon"></i>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="userHeaderAvatarBtn" title="User Profile" class="hidden relative w-8 h-8 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white text-xs font-extrabold shadow-sm active:scale-95 transition">
+          <span id="userAvatarInitial">U</span>
+          <span id="userAvatarStatusDot" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900"></span>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="mobileMenuBtn" title="Menu" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-cyan-500 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="drawer-content fixed top-0 right-0 bottom-0 w-72 bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 p-5 space-y-5 transform translate-x-full transition-transform duration-300 flex flex-col justify-between overflow-y-auto">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+          <span class="font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-brand-500"></i> Navigation
+          </span>
+          <button onclick="toggleMobileDrawer()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Drawer User Profile Card -->
+        <div id="drawerUserCard" class="hidden p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow-md">
+            <span id="drawerAvatarInitial">U</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-sm truncate" id="drawerUserName">User</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="drawerUserEmail">user@example.com</div>
+            <div class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="drawerUserSub">Active Plan</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+          <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-house w-4 text-center text-slate-400"></i> Home
+          </a>
+          <a href="/pricing" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-brand-600 dark:text-brand-400 font-bold">
+            <i class="fa-solid fa-tags w-4 text-center text-amber-500"></i> Plans & Pricing
+          </a>
+          <div id="drawerUserLinks" class="hidden space-y-1 pt-2 border-t border-slate-200 dark:border-slate-800">
+            <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-chart-pie w-4 text-center text-cyan-500"></i> Bot Overview
+            </a>
+            <a href="/channels" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-network-wired w-4 text-center text-indigo-500"></i> Channels
+            </a>
+            <a href="/rules" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-purple-500"></i> Rules & Cleaner
+            </a>
+            <a href="/logs" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-terminal w-4 text-center text-emerald-500"></i> Live Logs
+            </a>
+            <a href="/support" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-headset w-4 text-center text-sky-500"></i> Support Desk
+            </a>
+            <a id="drawerAdminBtn" href="/admin" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-bold transition">
+              <i class="fa-solid fa-shield-halved w-4 text-center"></i> Admin CRM
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
+        <div id="drawerAuthActions" class="space-y-2">
+          <button onclick="toggleMobileDrawer(); openAuthModal('login')" class="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-xs">
+            Sign In
+          </button>
+          <button onclick="toggleMobileDrawer(); openAuthModal('register')" class="w-full py-2.5 rounded-xl bg-brand-500 text-white font-bold text-xs shadow-md">
+            Create Account
+          </button>
+        </div>
+        <div id="drawerLogoutAction" class="hidden">
+          <button onclick="logout()" class="w-full py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-2 hover:bg-rose-500/20 transition">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Pricing Content -->
+  <main class="app-container space-y-6">
+    
+    <!-- Current Active Plan Status Banner (Visible for Activated Subscribers) -->
+    <div id="currentPlanStatusBanner" class="hidden glass-card rounded-2xl p-5 border-emerald-500/40 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 badge-pulse"></span> Account: Activated
+          </span>
+          <span class="text-xs text-slate-400 font-medium">Subscription Active</span>
+        </div>
+        <h3 class="text-xl font-extrabold text-white mt-1.5" id="currentActivePlanTitle">Starter Plan</h3>
+        <p class="text-xs text-slate-300 mt-0.5" id="currentActivePlanLimit">Max 1 Source Channel to copy from • Valid until Active</p>
+      </div>
+      <div class="text-left sm:text-right">
+        <div class="text-xs text-slate-400 font-medium">Want to copy signals from more channels?</div>
+        <div class="text-xs font-bold text-brand-400">Upgrade to Pro Trader (3 Channels) or Enterprise (10 Channels) below!</div>
+      </div>
+    </div>
+
+    <!-- Pricing Header -->
+    <div class="text-center max-w-xl mx-auto space-y-3">
+      <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight" id="pricingHeaderTitle">
+        Choose Your Mirroring Tier
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-400 px-2" id="pricingHeaderDesc">
+        Instant activation via Paystack, Korapay, OPay, PalmPay, or direct manual bank deposit.
+      </p>
+      <div>
+        <button onclick="openGiveawayModal()" class="text-xs px-3.5 py-1.5 rounded-full bg-purple-950/60 border border-purple-500/40 text-purple-300 hover:bg-purple-900/60 transition">
+          <i class="fa-solid fa-gift mr-1 text-purple-400"></i> Have a Promo Code? Redeem Free Pass
+        </button>
+      </div>
+    </div>
+
+    <!-- Plan Cards Grid -->
+    <div id="pricingPlansGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Populated via loadPlans() -->
+    </div>
+  </main>
+
+  <!-- Visitor Bottom Dock -->
+  <nav id="visitorBottomNav" class="fixed bottom-3 inset-x-0 z-40 max-w-sm mx-auto px-3 pb-safe pointer-events-none">
+    <div class="glass-dock pointer-events-auto rounded-3xl p-1.5 flex items-center justify-around">
+      <a href="/" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/home">
+        <i class="fa-solid fa-house text-sm"></i>
+        <span class="text-[10px] font-bold">Home</span>
+      </a>
+      <a href="/pricing" class="dock-item active flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-cyan-400 font-bold transition" data-target="/pricing">
+        <i class="fa-solid fa-tags text-sm"></i>
+        <span class="text-[10px] font-bold">Plans</span>
+      </a>
+      <button onclick="openAuthModal('login')" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition">
+        <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
+        <span class="text-[10px] font-bold">Sign In</span>
+      </button>
+      <button onclick="openAuthModal('register')" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-brand-400 font-bold transition">
+        <div class="w-7 h-7 -mt-1 rounded-full bg-brand-500 text-white flex items-center justify-center shadow-md shadow-brand-500/40">
+          <i class="fa-solid fa-user-plus text-xs"></i>
+        </div>
+        <span class="text-[10px]">Register</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- User Bottom Dock -->
+  <nav id="userBottomNav" class="hidden fixed bottom-3 inset-x-0 z-40 max-w-lg mx-auto px-3 pb-safe pointer-events-none">
+    <div class="glass-dock pointer-events-auto rounded-3xl p-1.5 flex items-center justify-around">
+      <a href="/dashboard" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/dashboard">
+        <i class="fa-solid fa-chart-pie text-sm"></i>
+        <span class="text-[10px] font-bold">Overview</span>
+      </a>
+      <a href="/channels" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/channels">
+        <i class="fa-solid fa-network-wired text-sm"></i>
+        <span class="text-[10px] font-bold">Channels</span>
+      </a>
+      <a href="/rules" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/rules">
+        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+        <span class="text-[10px] font-bold">Customizer</span>
+      </a>
+      <a href="/logs" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/logs">
+        <i class="fa-solid fa-terminal text-sm"></i>
+        <span class="text-[10px] font-bold">Logs</span>
+      </a>
+      <a href="/pricing" class="dock-item active flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-cyan-400 font-bold transition" data-target="/pricing">
+        <i class="fa-solid fa-arrow-up-right-dots text-sm"></i>
+        <span class="text-[10px] font-bold">Upgrade</span>
+      </a>
+      <a href="/support" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/support">
+        <i class="fa-solid fa-headset text-sm"></i>
+        <span class="text-[10px] font-bold">Support</span>
+      </a>
+      <a id="userBottomAdminBtn" href="/admin" class="hidden dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-purple-400 font-bold transition" data-target="/admin">
+        <i class="fa-solid fa-shield-halved text-sm"></i>
+        <span class="text-[10px] font-bold">Admin</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="glass-card rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 border-slate-700 space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-credit-card text-brand-400"></i> Complete Subscription
+        </h3>
+        <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-lg bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="bg-slate-900/70 p-3.5 rounded-xl border border-slate-800 flex justify-between items-center">
+        <div>
+          <div id="checkoutPlanName" class="font-bold text-white text-sm">Starter Plan</div>
+          <div id="checkoutPlanDuration" class="text-xs text-slate-400">30 Days Validity</div>
+        </div>
+        <div id="checkoutPlanPrice" class="text-lg sm:text-xl font-extrabold text-brand-400">₦10,000</div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-300">Choose Payment Method</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="selectPaymentMethod('paystack')" class="pay-method-btn p-3 rounded-xl border border-brand-500 bg-brand-500/10 text-xs font-bold text-white flex items-center gap-2 transition" data-method="paystack">
+            <i class="fa-solid fa-bolt text-brand-400"></i> Paystack / Cards
+          </button>
+          <button type="button" onclick="selectPaymentMethod('korapay')" class="pay-method-btn p-3 rounded-xl border border-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-900 flex items-center gap-2 transition" data-method="korapay">
+            <i class="fa-solid fa-building-columns text-emerald-400"></i> Korapay / Bank
+          </button>
+          <button type="button" onclick="selectPaymentMethod('opay')" class="pay-method-btn p-3 rounded-xl border border-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-900 flex items-center gap-2 transition" data-method="opay">
+            <i class="fa-solid fa-wallet text-sky-400"></i> OPay / PalmPay
+          </button>
+          <button type="button" onclick="selectPaymentMethod('manual')" class="pay-method-btn p-3 rounded-xl border border-slate-800 text-xs font-semibold text-slate-300 hover:bg-slate-900 flex items-center gap-2 transition" data-method="manual">
+            <i class="fa-solid fa-money-bill-transfer text-amber-400"></i> Manual Transfer
+          </button>
+        </div>
+      </div>
+
+      <!-- Auto payment button -->
+      <div id="autoPaymentSection" class="pt-2">
+        <button onclick="initiateAutoPayment()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-cyan-600 hover:from-brand-600 hover:to-cyan-700 text-white font-extrabold text-sm shadow-md transition">
+          Proceed to Secure Gateway <i class="fa-solid fa-arrow-right ml-1"></i>
+        </button>
+      </div>
+
+      <!-- Manual Bank Transfer Form -->
+      <div id="manualPaymentSection" class="hidden space-y-3 pt-2">
+        <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 text-xs space-y-1">
+          <div class="text-slate-400">Bank Name: <strong id="manualBankName" class="text-white">Zenith Bank</strong></div>
+          <div class="text-slate-400">Account Number: <strong id="manualAccountNum" class="text-brand-400 font-mono text-sm">1234567890</strong> <button onclick="copyManualAcc()" class="ml-2 text-slate-400 hover:text-white"><i class="fa-solid fa-copy"></i></button></div>
+          <div class="text-slate-400">Account Name: <strong id="manualAccountName" class="text-white">TeleMirror Enterprise</strong></div>
+          <div id="manualInstructions" class="text-[11px] text-amber-300/90 pt-1"></div>
+        </div>
+
+        <form onsubmit="handleManualSubmit(event)" class="space-y-2.5">
+          <input type="text" id="manualSenderName" required placeholder="Sender Full Name (as on your bank account)" class="glass-input w-full p-2.5 rounded-xl text-xs">
+          <input type="text" id="manualSenderBank" required placeholder="Your Bank Name (e.g. GTBank, Kuda)" class="glass-input w-full p-2.5 rounded-xl text-xs">
+          <input type="text" id="manualRef" required placeholder="Transfer Reference / Session ID" class="glass-input w-full p-2.5 rounded-xl text-xs font-mono">
+          <button type="submit" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-xs shadow-md transition">
+            Submit Payment Proof for Approval
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Giveaway Modal -->
+  <div id="giveawayModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-sm w-full p-6 border-slate-700 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+          <i class="fa-solid fa-gift text-purple-400"></i> Redeem Promo Pass
+        </h3>
+        <button onclick="closeGiveawayModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="handleClaimGiveaway(event)" class="space-y-3">
+        <input type="text" id="giveawayCodeInput" required placeholder="Enter Promo Code (e.g. VIPFREE)" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs font-mono uppercase text-center tracking-wider font-bold">
+        <button type="submit" class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md">
+          Claim Free Access
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared Auth Modal -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="glass-card rounded-t-3xl sm:rounded-2xl max-w-sm w-full p-6 border-slate-700 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex gap-4">
+          <button id="authTabLogin" onclick="switchAuthTab('login')" class="text-sm font-bold text-brand-400 border-b-2 border-brand-500 pb-1">Sign In</button>
+          <button id="authTabRegister" onclick="switchAuthTab('register')" class="text-sm font-bold text-slate-400 hover:text-white pb-1">Register</button>
+        </div>
+        <button onclick="closeAuthModal()" class="w-7 h-7 rounded-lg bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+          <input type="email" id="loginEmail" required class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="name@example.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+          <input type="password" id="loginPassword" required class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md transition">
+          Sign In
+        </button>
+      </form>
+      <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3 hidden">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
+          <input type="text" id="regName" required class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="John Doe">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+          <input type="email" id="regEmail" required class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="name@example.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+          <input type="password" id="regPassword" required minlength="6" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md transition">
+          Create Account & Subscribe
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
+
+  <script src="/static/js/app-core.js"></script>
+  <script>
+    let SELECTED_PLAN = null;
+    let SELECTED_METHOD = 'paystack';
+    let PAYMENT_METHODS = {};
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadPaymentMethods();
+      await loadPlans();
+      await checkAuthAndSubscription(() => {
+        renderPlansGrid();
+      });
+    });
+
+    async function loadPlans() {
+      try {
+        const res = await fetch('/api/plans');
+        const data = await res.json();
+        if (data.success) {
+          PLANS = data.plans;
+          renderPlansGrid();
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function renderPlansGrid() {
+      const grid = document.getElementById('pricingPlansGrid');
+      if (!grid) return;
+      const planBanner = document.getElementById('currentPlanStatusBanner');
+      const planTitle = document.getElementById('currentActivePlanTitle');
+      const planLimit = document.getElementById('currentActivePlanLimit');
+      const pricingHeader = document.getElementById('pricingHeaderTitle');
+      const pricingDesc = document.getElementById('pricingHeaderDesc');
+
+      const isSub = Boolean(CURRENT_USER && SUBSCRIPTION && SUBSCRIPTION.is_subscribed);
+      const userPlanId = SUBSCRIPTION ? SUBSCRIPTION.plan_id : null;
+      const userPlanName = SUBSCRIPTION ? (SUBSCRIPTION.plan_name || '') : '';
+      const isAdmin = CURRENT_USER && CURRENT_USER.role === 'admin';
+      const userLimit = isAdmin ? 9999 : (SUBSCRIPTION && SUBSCRIPTION.channel_limit !== undefined ? SUBSCRIPTION.channel_limit : 1);
+
+      if (isSub) {
+        if (planBanner) planBanner.classList.remove('hidden');
+        if (planTitle) planTitle.innerText = `${userPlanName || 'Active'} Plan`;
+        if (planLimit) {
+          const expDate = SUBSCRIPTION.end_date || SUBSCRIPTION.expires_at || 'Active';
+          planLimit.innerText = isAdmin
+            ? `Unlimited Source Channels (Admin Bypass) • Status: Active`
+            : `Max ${userLimit} Source Channel${userLimit > 1 ? 's' : ''} to copy from • Valid until ${expDate}`;
+        }
+        if (pricingHeader) pricingHeader.innerText = 'Upgrade Your Channel Limit';
+        if (pricingDesc) pricingDesc.innerText = 'Need to mirror signals from more source channels? Select an upgraded tier below to expand your limit with zero friction.';
+      } else {
+        if (planBanner) planBanner.classList.add('hidden');
+        if (pricingHeader) pricingHeader.innerText = 'Choose Your Mirroring Plan';
+        if (pricingDesc) pricingDesc.innerText = 'Instant activation with automatic gateways (Paystack, Korapay, OPay, PalmPay) or direct manual bank deposit.';
+      }
+
+      grid.innerHTML = PLANS.map(p => {
+        const isCurrentPlan = isSub && (p.id === userPlanId || p.name.toLowerCase() === userPlanName.toLowerCase());
+        const isHigherPlan = isSub && (p.channel_limit > userLimit);
+
+        let ctaButtonHtml = '';
+        if (isCurrentPlan) {
+          ctaButtonHtml = `
+            <button disabled class="mt-5 w-full py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center gap-1.5 cursor-default">
+              <i class="fa-solid fa-circle-check text-emerald-400"></i> Your Current Plan (Active)
+            </button>
+          `;
+        } else if (isHigherPlan) {
+          ctaButtonHtml = `
+            <button onclick="startCheckout(${p.id})" class="mt-5 w-full py-3 rounded-xl bg-gradient-to-r from-brand-500 via-indigo-600 to-purple-600 hover:from-brand-600 hover:to-purple-700 text-white font-extrabold text-xs shadow-lg shadow-brand-500/30 transition-all flex items-center justify-center gap-1.5">
+              <span>Upgrade to ${p.name} (${p.channel_limit} Channels)</span>
+              <i class="fa-solid fa-arrow-up-right-dots"></i>
+            </button>
+          `;
+        } else if (isSub) {
+          ctaButtonHtml = `
+            <button onclick="startCheckout(${p.id})" class="mt-5 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-all">
+              Switch to ${p.name} (${p.channel_limit} Channels)
+            </button>
+          `;
+        } else {
+          ctaButtonHtml = `
+            <button onclick="startCheckout(${p.id})" class="mt-5 w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md transition-all">
+              Subscribe Now
+            </button>
+          `;
+        }
+
+        return `
+          <div class="glass-card rounded-2xl p-5 sm:p-6 border ${isCurrentPlan ? 'border-emerald-500/60 ring-1 ring-emerald-500/40' : 'border-slate-800 hover:border-brand-500/50'} flex flex-col justify-between transition-all">
+            <div class="space-y-3.5">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-lg sm:text-xl font-bold text-white">${p.name}</h3>
+                  <p class="text-xs text-slate-400 mt-1">${p.description || ''}</p>
+                </div>
+                ${isCurrentPlan ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold uppercase">Active</span>' : ''}
+              </div>
+              <div class="text-2xl sm:text-3xl font-extrabold text-white">
+                ₦${Number(p.price).toLocaleString()} <span class="text-xs text-slate-400 font-normal">/ ${p.duration_days} days</span>
+              </div>
+              <div class="text-xs font-bold ${p.channel_limit > 1 ? 'text-purple-400' : 'text-brand-400'} flex items-center gap-1.5">
+                <i class="fa-solid fa-satellite-dish"></i> Up to ${p.channel_limit} Source Channels
+              </div>
+              <ul class="space-y-2 text-xs text-slate-300 border-t border-slate-800 pt-3">
+                ${(p.features || []).map(f => `<li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> ${f}</li>`).join('')}
+              </ul>
+            </div>
+            ${ctaButtonHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadPaymentMethods() {
+      try {
+        const res = await fetch('/api/payment/methods');
+        const data = await res.json();
+        if (data.success) PAYMENT_METHODS = data.methods;
+      } catch (e) { console.error(e); }
+    }
+
+    function startCheckout(planId) {
+      if (!CURRENT_USER) {
+        showToast('Please sign in or create an account first.', 'info');
+        openAuthModal('register');
+        return;
+      }
+      SELECTED_PLAN = PLANS.find(p => p.id === planId);
+      if (!SELECTED_PLAN) return;
+
+      document.getElementById('checkoutPlanName').innerText = SELECTED_PLAN.name;
+      document.getElementById('checkoutPlanDuration').innerText = `${SELECTED_PLAN.duration_days} Days Validity`;
+      document.getElementById('checkoutPlanPrice').innerText = `₦${Number(SELECTED_PLAN.price).toLocaleString()}`;
+      
+      selectPaymentMethod('paystack');
+      document.getElementById('checkoutModal').classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutModal').classList.add('hidden');
+    }
+
+    function selectPaymentMethod(method) {
+      SELECTED_METHOD = method;
+      document.querySelectorAll('.pay-method-btn').forEach(b => {
+        b.classList.remove('border-brand-500', 'bg-brand-500/10');
+        if (b.dataset.method === method) b.classList.add('border-brand-500', 'bg-brand-500/10');
+      });
+
+      if (method === 'manual') {
+        document.getElementById('autoPaymentSection').classList.add('hidden');
+        document.getElementById('manualPaymentSection').classList.remove('hidden');
+        if (PAYMENT_METHODS.manual) {
+          document.getElementById('manualBankName').innerText = PAYMENT_METHODS.manual.bank_name || 'Zenith Bank';
+          document.getElementById('manualAccountNum').innerText = PAYMENT_METHODS.manual.account_number || '1234567890';
+          document.getElementById('manualAccountName').innerText = PAYMENT_METHODS.manual.account_name || 'TeleMirror Enterprise';
+          document.getElementById('manualInstructions').innerText = PAYMENT_METHODS.manual.instructions || '';
+        }
+      } else {
+        document.getElementById('autoPaymentSection').classList.remove('hidden');
+        document.getElementById('manualPaymentSection').classList.add('hidden');
+      }
+    }
+
+    function copyManualAcc() {
+      const num = document.getElementById('manualAccountNum').innerText;
+      navigator.clipboard.writeText(num);
+      showToast('Account number copied to clipboard!', 'success');
+    }
+
+    async function initiateAutoPayment() {
+      try {
+        const res = await fetch('/api/payment/initialize', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ plan_id: SELECTED_PLAN.id, gateway: SELECTED_METHOD })
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeCheckoutModal();
+          showToast('Redirecting to secure gateway...', 'info');
+          window.location.href = data.data.checkout_url;
+        } else {
+          showToast(data.error || 'Failed to initialize payment.', 'error');
+        }
+      } catch (e) {
+        showToast('Network error initializing payment.', 'error');
+      }
+    }
+
+    async function handleManualSubmit(e) {
+      e.preventDefault();
+      try {
+        const proof_data = {
+          sender_name: document.getElementById('manualSenderName').value,
+          sender_bank: document.getElementById('manualSenderBank').value,
+          reference: document.getElementById('manualRef').value
+        };
+        const res = await fetch('/api/payment/manual-submit', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ plan_id: SELECTED_PLAN.id, proof_data })
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeCheckoutModal();
+          showToast('Manual payment submitted for approval! Reference: ' + data.data.reference, 'success');
+        } else {
+          showToast(data.error || 'Error submitting manual payment.', 'error');
+        }
+      } catch (err) {
+        showToast('Error submitting payment.', 'error');
+      }
+    }
+
+    function openGiveawayModal() { document.getElementById('giveawayModal').classList.remove('hidden'); }
+    function closeGiveawayModal() { document.getElementById('giveawayModal').classList.add('hidden'); }
+
+    async function handleClaimGiveaway(e) {
+      e.preventDefault();
+      if (!CURRENT_USER) {
+        showToast('Please sign in or register to redeem your code.', 'info');
+        openAuthModal('register');
+        return;
+      }
+      const code = document.getElementById('giveawayCodeInput').value;
+      try {
+        const res = await fetch('/api/payment/giveaway/claim', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeGiveawayModal();
+          showToast(data.message, 'success');
+          window.location.href = '/onboarding';
+        } else {
+          showToast(data.error || 'Invalid giveaway code.', 'error');
+        }
+      } catch (err) {
+        showToast('Error claiming code.', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

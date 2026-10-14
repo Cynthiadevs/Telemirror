@@ -1,0 +1,20 @@
+‎I want you to upgrade I to telemirror v2 
+‎This version support users, users can subscribe to the platform and use it... Create a frontend page then registration page and login page for user to login and create an account.... If user create account they should not be able to do anything, untill they subscribe, whatever function they clicked should redirect to subscription page, so if user click on subscribe to a particular plan, it will take user to the payment page, user can select automatic payment method or manual payment method, after that show a next page for the user to make payment to the selected method, if user uses automatic payment, if payment is verified successfully it should take user to onboarding while if user uses manual payment, payment should show success but pending, anytime the system or admin approved the payment, anything user login they should see onboarding... Yhe onboarding is the setting up the account, which includes , the phone number, API hash, or API id... Then ensure to send otp to verify the number, then 2fa if user enabled it ... After successfully adding the account.... next step on onboarding is setting up the message customizer and the promotion engine, so user can setup the account and messages flow completely, so after it's successful redirect to dashboard and show user tips and toturial to start the bot and also join our telegram support channel,  the user based page should be exactly as it is now, only subscribed users can use the platform.... 
+‎
+‎
+‎
+‎While you will add admin dashboard too for managing the whole platform,  admin dashboard is different, it's the new dashboard you will create, admin should have analytics of everything going on in the system users payment, income full crm . dashboard, then admin should have all nav pages ...
+‎
+‎Dashboard
+‎Manage users - edit users, activate or deactivate user, impersonate users, verify user account, delete user, 
+‎Manage plans - manage subscription plans 
+‎Payment method - manage payment method,  automatic or manual, add payment method, automatic or manual (integrate paystack, kora, opay, palmpay automatic payment system)
+‎Subscription plans - manage and create subscription plans 
+‎Subscription history - history of users who subscribe, automatic or manual, admin can approve manual subscription from this page and also decline, and also view the payment details 
+‎Transaction history, all transactions history in the system 
+‎News letter - user can see the banner and subscribe or our emailing marketing services 
+‎Message center - where admin can select single or multiple user to send the platform branded email to users 
+‎Support - if user create support ticket, admin can chat with the user in the support page, can manage all users 
+‎Giveaway - free use for all users or selected method, for new users only, for everyone, for selected users
+‎Site Settings - site settings, change site name, logo, seo, email settings, security settings, maintenance settings,  error logs and handlers , ensure to suggest and add more to it
+‎

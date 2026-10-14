@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Setup Wizard • TeleMirror</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#ecfeff', 100: '#cffafe', 400: '#22d3ee', 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="/static/css/theme.css">
+</head>
+<body class="aceternity-bg text-slate-100 flex flex-col min-h-screen">
+
+  <!-- Top Mobile App Header -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <a href="/dashboard" class="flex items-center gap-2.5 shrink-0 hover:opacity-90 transition">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-500 to-cyan-400 flex items-center justify-center text-white font-black shadow-md shadow-brand-500/25">
+          <i class="fa-brands fa-telegram text-base"></i>
+        </div>
+        <div class="flex items-center">
+          <span class="text-sm font-extrabold tracking-tight">TeleMirror</span>
+        </div>
+      </a>
+
+      <!-- Right: Compact Control Cluster -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Light/Dark Theme" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-amber-400 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-sun" id="themeToggleIcon"></i>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="userHeaderAvatarBtn" title="User Profile" class="hidden relative w-8 h-8 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white text-xs font-extrabold shadow-sm active:scale-95 transition">
+          <span id="userAvatarInitial">U</span>
+          <span id="userAvatarStatusDot" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900"></span>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="mobileMenuBtn" title="Menu" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-cyan-500 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="drawer-content fixed top-0 right-0 bottom-0 w-72 bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 p-5 space-y-5 transform translate-x-full transition-transform duration-300 flex flex-col justify-between overflow-y-auto">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+          <span class="font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-brand-500"></i> Navigation
+          </span>
+          <button onclick="toggleMobileDrawer()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Drawer User Profile Card -->
+        <div id="drawerUserCard" class="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow-md">
+            <span id="drawerAvatarInitial">U</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-sm truncate" id="drawerUserName">User</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="drawerUserEmail">user@example.com</div>
+            <div class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="drawerUserSub">Active Plan</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+          <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-chart-pie w-4 text-center text-cyan-500"></i> Bot Overview
+          </a>
+          <a href="/channels" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-network-wired w-4 text-center text-indigo-500"></i> Channels
+          </a>
+          <a href="/rules" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-purple-500"></i> Rules & Cleaner
+          </a>
+          <a href="/logs" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-terminal w-4 text-center text-emerald-500"></i> Live Logs
+          </a>
+          <a href="/pricing" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-arrow-up-right-dots w-4 text-center text-amber-500"></i> Upgrade Plan
+          </a>
+          <a href="/onboarding" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-brand-600 dark:text-brand-400 font-bold">
+            <i class="fa-solid fa-sliders w-4 text-center text-brand-500"></i> Setup Wizard
+          </a>
+          <a href="/support" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-headset w-4 text-center text-sky-500"></i> Support Desk
+          </a>
+          <a id="drawerAdminBtn" href="/admin" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-bold transition">
+            <i class="fa-solid fa-shield-halved w-4 text-center"></i> Admin CRM Portal
+          </a>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
+        <button onclick="logout()" class="w-full py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-2 hover:bg-rose-500/20 transition">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Wizard Content -->
+  <main class="app-container max-w-2xl space-y-6">
+    
+    <!-- Steps Indicator -->
+    <div class="flex items-center justify-between text-xs px-2 sm:px-4">
+      <div id="stepTab1" onclick="showOnboardingStep(1)" class="wizard-step flex items-center gap-1.5 text-brand-400 font-bold cursor-pointer select-none">
+        <span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/40 flex items-center justify-center text-[11px] shrink-0">1</span>
+        <span>Connect</span>
+      </div>
+      <div class="flex-1 mx-2 h-0.5 bg-slate-800"></div>
+      <div id="stepTab2" onclick="showOnboardingStep(2)" class="wizard-step flex items-center gap-1.5 text-slate-500 font-medium cursor-pointer select-none">
+        <span class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[11px] shrink-0">2</span>
+        <span>OTP / 2FA</span>
+      </div>
+      <div class="flex-1 mx-2 h-0.5 bg-slate-800"></div>
+      <div id="stepTab3" onclick="showOnboardingStep(3)" class="wizard-step flex items-center gap-1.5 text-slate-500 font-medium cursor-pointer select-none">
+        <span class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[11px] shrink-0">3</span>
+        <span>Rules</span>
+      </div>
+      <div class="flex-1 mx-2 h-0.5 bg-slate-800"></div>
+      <div id="stepTab4" onclick="showOnboardingStep(4)" class="wizard-step flex items-center gap-1.5 text-slate-500 font-medium cursor-pointer select-none">
+        <span class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[11px] shrink-0">4</span>
+        <span>Ready</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Telegram Credentials OR Account Connected State -->
+    <div id="onboardingStep1" class="glass-card rounded-2xl p-6 sm:p-8 border-slate-800 space-y-5">
+      
+      <!-- Connected State: Shown when user already logged in Telegram -->
+      <div id="step1ConnectedState" class="space-y-5 hidden">
+        <div class="flex items-start sm:items-center justify-between flex-wrap gap-2.5 border-b border-slate-800/80 pb-4">
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-brands fa-telegram text-sky-400 text-xl"></i> Account Connected
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Your Telegram account is active and authorized for TeleMirror.
+            </p>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Active & Connected
+          </span>
+        </div>
+
+        <!-- Account Profile Details -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-blue-600/20 border border-sky-500/30 text-sky-400 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+              <i class="fa-brands fa-telegram"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span id="connectedPhoneDisplay" class="text-sm sm:text-base font-extrabold text-white font-mono">+234...</span>
+                <span id="connectedUsernameDisplay" class="text-xs text-brand-400 font-bold"></span>
+              </div>
+              <div class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                <i class="fa-solid fa-shield-check text-emerald-400"></i>
+                <span>Session Authenticated & MTProto Encrypted</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-left sm:text-right border-t sm:border-t-0 border-slate-800/80 pt-2 sm:pt-0">
+            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Engine Status</div>
+            <div id="connectedEngineStatus" class="text-xs font-bold text-emerald-400">Ready to Mirror</div>
+          </div>
+        </div>
+
+        <!-- Info Notice -->
+        <div class="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs text-slate-300 flex items-start gap-2.5">
+          <i class="fa-solid fa-circle-info text-sky-400 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            Your Telegram session is already saved. To use a different Telegram account, tap <strong>Remove Account</strong> below to disconnect this account and link a new one.
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="space-y-3 pt-1">
+          <button type="button" onclick="showOnboardingStep(3)" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-cyan-600 hover:from-brand-600 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2">
+            Continue to Rules & Channels <i class="fa-solid fa-arrow-right"></i>
+          </button>
+          
+          <button type="button" onclick="openRemoveAccountModal()" class="w-full py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-trash-can"></i> Remove Account to Add New One
+          </button>
+        </div>
+      </div>
+
+      <!-- Disconnected / Form State: Shown when no Telegram account is linked -->
+      <div id="step1FormState" class="space-y-5">
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-brands fa-telegram text-sky-400"></i> Connect Telegram Account
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Obtain your free API ID and API Hash from <a href="https://my.telegram.org" target="_blank" class="text-brand-400 underline font-semibold">my.telegram.org</a> under "API Development Tools".
+          </p>
+        </div>
+
+        <form onsubmit="handleRequestTelegramCode(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Telegram Phone Number (International format)</label>
+            <input type="text" id="obPhone" required placeholder="+2348012345678" class="glass-input w-full px-3.5 py-3 rounded-xl text-sm font-mono">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Telegram API ID</label>
+              <input type="text" id="obApiId" required placeholder="e.g. 21547934" class="glass-input w-full px-3.5 py-3 rounded-xl text-sm font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Telegram API Hash</label>
+              <input type="text" id="obApiHash" required placeholder="e.g. da2c2ee5b27..." class="glass-input w-full px-3.5 py-3 rounded-xl text-sm font-mono">
+            </div>
+          </div>
+          <button type="submit" id="requestOtpBtn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-cyan-600 hover:from-brand-600 text-white font-bold text-sm shadow-md transition">
+            <i class="fa-solid fa-paper-plane mr-2"></i> Send Verification Code to Telegram
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Step 2: OTP & 2FA -->
+    <div id="onboardingStep2" class="glass-card rounded-2xl p-6 sm:p-8 border-slate-800 space-y-5 hidden">
+      <div>
+        <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-key text-amber-400"></i> Enter Telegram Code
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">Check your official Telegram app messages for the login code.</p>
+      </div>
+
+      <form onsubmit="handleVerifyTelegramCode(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">5-Digit Telegram Code</label>
+          <input type="text" id="obOtpCode" required placeholder="12345" class="glass-input w-full px-4 py-3 rounded-xl text-base font-mono text-center tracking-widest font-bold">
+        </div>
+
+        <div id="ob2faContainer" class="hidden">
+          <label class="block text-xs font-semibold text-amber-300 mb-1">
+            <i class="fa-solid fa-lock text-amber-400 mr-1"></i> Two-Step Verification (2FA) Cloud Password
+          </label>
+          <input type="password" id="ob2faPassword" placeholder="Enter your 2FA Cloud Password" class="glass-input w-full px-4 py-3 rounded-xl text-sm">
+        </div>
+
+        <div class="flex gap-2.5">
+          <button type="button" onclick="showOnboardingStep(1)" class="w-1/3 py-3 rounded-xl bg-slate-900 text-slate-300 hover:text-white text-xs font-semibold">
+            Back
+          </button>
+          <button type="submit" id="verifyOtpBtn" class="w-2/3 py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm shadow-md transition">
+            Verify Account <i class="fa-solid fa-check ml-1"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 3: Message Customizer & Rules (Enforces Plan Limit) -->
+    <div id="onboardingStep3" class="glass-card rounded-2xl p-6 sm:p-8 border-slate-800 space-y-5 hidden">
+      <div>
+        <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-purple-400"></i> Initial Channel & Cleaner Setup
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">Define your signal sources and promotion replacements.</p>
+      </div>
+
+      <form onsubmit="handleSaveCustomizer(event)" class="space-y-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Source Channels (To copy from)</label>
+            <input type="text" id="obSources" required placeholder="@signals1, @signals2" class="glass-input w-full px-3 py-2.5 rounded-xl text-xs font-mono">
+            <span class="text-[10px] text-brand-400" id="obPlanLimitNotice">Plan limit enforced</span>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Destination Channels (Broadcast target)</label>
+            <input type="text" id="obDestinations" required placeholder="@myvipchannel" class="glass-input w-full px-3 py-2.5 rounded-xl text-xs font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Replace competitor @usernames with</label>
+          <input type="text" id="obReplacementUsername" placeholder="@myvipadmin" class="glass-input w-full px-3 py-2.5 rounded-xl text-xs">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Custom Header</label>
+            <input type="text" id="obHeader" placeholder="⚡️ VIP SIGNAL ALERT ⚡️" class="glass-input w-full px-3 py-2.5 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Custom Footer</label>
+            <input type="text" id="obFooter" placeholder="🚀 Trade at: t.me/myvipchannel" class="glass-input w-full px-3 py-2.5 rounded-xl text-xs">
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="obRemoveUrls" class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-brand-500">
+          <label for="obRemoveUrls" class="text-xs text-slate-300">Strip competitor external web links and URLs</label>
+        </div>
+
+        <div class="flex gap-2.5 pt-1">
+          <button type="button" onclick="showOnboardingStep(1)" class="w-1/3 py-3.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+            <i class="fa-solid fa-arrow-left"></i> Account
+          </button>
+          <button type="submit" class="w-2/3 py-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow-md transition">
+            Save Rules & Continue <i class="fa-solid fa-arrow-right ml-1"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 4: Ready Confirmation & Launch -->
+    <div id="onboardingStep4" class="glass-card rounded-2xl p-6 sm:p-8 border-slate-800 space-y-5 text-center hidden">
+      <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl mx-auto">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div class="space-y-1">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-white">Your Bot Is Ready!</h2>
+        <p class="text-xs text-slate-400 max-w-md mx-auto">
+          Your Telegram session is verified and message transformation rules are configured.
+        </p>
+      </div>
+
+      <div class="text-left bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-1.5 text-xs text-slate-300">
+        <div class="font-bold text-brand-400 flex items-center gap-1.5"><i class="fa-solid fa-lightbulb"></i> Startup Instructions:</div>
+        <div>1. Ensure your Telegram account is joined to the source signal channels.</div>
+        <div>2. Ensure your account is an Admin with post permissions in destination channels.</div>
+        <div>3. Tap <strong>Start Bot</strong> on your dashboard to begin live mirroring.</div>
+      </div>
+
+      <div class="space-y-2.5 pt-2">
+        <a id="telegramSupportChannelLink" href="https://t.me/telemirror_support" target="_blank" class="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm shadow-md transition">
+          <i class="fa-brands fa-telegram text-base"></i> Join Official Telegram Support Channel
+        </a>
+        <button onclick="handleCompleteOnboarding()" class="w-full py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-sm shadow-md transition">
+          Open Bot Dashboard <i class="fa-solid fa-arrow-right ml-1"></i>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Remove Telegram Account Confirmation Modal -->
+  <div id="removeAccountModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-card rounded-2xl max-w-sm w-full p-6 border-slate-800 space-y-4 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center text-xl mx-auto shadow-inner">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-white">Remove Telegram Account?</h3>
+        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+          Are you sure you want to disconnect this Telegram account? Your active bot engine will be stopped and credentials cleared so you can add a new Telegram account.
+        </p>
+      </div>
+      <div class="flex gap-2.5 pt-2">
+        <button type="button" onclick="closeRemoveAccountModal()" class="flex-1 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white font-semibold text-xs transition">
+          Cancel
+        </button>
+        <button type="button" id="confirmRemoveBtn" onclick="handleConfirmRemoveAccount()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-600/30 transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-trash-can"></i> Yes, Remove
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Bottom Dock -->
+  <nav id="userBottomNav" class="fixed bottom-3 inset-x-0 z-40 max-w-lg mx-auto px-3 pb-safe pointer-events-none">
+    <div class="glass-dock pointer-events-auto rounded-3xl p-1.5 flex items-center justify-around">
+      <a href="/dashboard" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/dashboard">
+        <i class="fa-solid fa-chart-pie text-sm"></i>
+        <span class="text-[10px] font-bold">Overview</span>
+      </a>
+      <a href="/channels" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/channels">
+        <i class="fa-solid fa-network-wired text-sm"></i>
+        <span class="text-[10px] font-bold">Channels</span>
+      </a>
+      <a href="/rules" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/rules">
+        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+        <span class="text-[10px] font-bold">Customizer</span>
+      </a>
+      <a href="/logs" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/logs">
+        <i class="fa-solid fa-terminal text-sm"></i>
+        <span class="text-[10px] font-bold">Logs</span>
+      </a>
+      <a href="/pricing" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/pricing">
+        <i class="fa-solid fa-arrow-up-right-dots text-sm text-amber-400"></i>
+        <span class="text-[10px] font-bold">Upgrade</span>
+      </a>
+      <a href="/support" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/support">
+        <i class="fa-solid fa-headset text-sm"></i>
+        <span class="text-[10px] font-bold">Support</span>
+      </a>
+      <a id="userBottomAdminBtn" href="/admin" class="hidden dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-purple-400 font-bold transition" data-target="/admin">
+        <i class="fa-solid fa-shield-halved text-sm"></i>
+        <span class="text-[10px] font-bold">Admin</span>
+      </a>
+    </div>
+  </nav>
+
+  <div id="toastContainer" class="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
+
+  <script src="/static/js/app-core.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuthAndSubscription((data) => {
+        if (!data.authenticated) {
+          window.location.href = '/';
+          return;
+        }
+        if (!data.subscription || !data.subscription.is_subscribed) {
+          window.location.href = '/pricing';
+          return;
+        }
+        const limit = (data.user && data.user.role === 'admin') ? 9999 : (data.subscription.channel_limit || 1);
+        const notice = document.getElementById('obPlanLimitNotice');
+        if (notice) notice.innerText = `Your plan allows up to ${limit} source channel(s)`;
+        restoreOnboardingStep();
+      });
+    });
+
+    // Close remove modal on outside click
+    document.addEventListener('click', (e) => {
+      const modal = document.getElementById('removeAccountModal');
+      if (modal && !modal.classList.contains('hidden') && e.target === modal) {
+        closeRemoveAccountModal();
+      }
+    });
+
+    function showOnboardingStep(stepNum) {
+      [1, 2, 3, 4].forEach(n => {
+        const stepEl = document.getElementById(`onboardingStep${n}`);
+        if (stepEl) stepEl.classList.add('hidden');
+        const tab = document.getElementById(`stepTab${n}`);
+        if (tab) {
+          if (n === 1 && ONBOARDING && (ONBOARDING.has_telegram || ONBOARDING.has_credentials)) {
+            tab.className = 'wizard-step flex items-center gap-1.5 text-emerald-400 font-bold cursor-pointer select-none';
+          } else {
+            tab.className = n <= stepNum ? 'wizard-step flex items-center gap-1.5 text-brand-400 font-bold cursor-pointer select-none' : 'wizard-step flex items-center gap-1.5 text-slate-500 font-medium cursor-pointer select-none';
+          }
+        }
+      });
+      const targetStep = document.getElementById(`onboardingStep${stepNum}`);
+      if (targetStep) targetStep.classList.remove('hidden');
+      if (stepNum === 1) updateStep1View();
+    }
+
+    function updateStep1View() {
+      const isConnected = Boolean(ONBOARDING && (ONBOARDING.has_telegram || ONBOARDING.has_credentials));
+      const connectedState = document.getElementById('step1ConnectedState');
+      const formState = document.getElementById('step1FormState');
+      const stepTab1 = document.getElementById('stepTab1');
+
+      if (isConnected) {
+        if (connectedState) connectedState.classList.remove('hidden');
+        if (formState) formState.classList.add('hidden');
+        
+        const tgAcc = ONBOARDING.telegram_account || {};
+        const phone = tgAcc.phone || ONBOARDING.phone_number || 'Session Saved';
+        const username = tgAcc.username ? `(${tgAcc.username})` : (tgAcc.first_name ? `(${tgAcc.first_name})` : '');
+        
+        const phoneEl = document.getElementById('connectedPhoneDisplay');
+        if (phoneEl) phoneEl.innerText = phone;
+        const userEl = document.getElementById('connectedUsernameDisplay');
+        if (userEl) userEl.innerText = username;
+        const engineEl = document.getElementById('connectedEngineStatus');
+        if (engineEl) engineEl.innerText = ONBOARDING.status === 'running' ? 'Active & Mirroring' : 'Ready to Mirror';
+        
+        if (stepTab1) {
+          stepTab1.innerHTML = '<span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center text-[11px] shrink-0"><i class="fa-solid fa-check text-[10px]"></i></span><span>Connected</span>';
+        }
+      } else {
+        if (connectedState) connectedState.classList.add('hidden');
+        if (formState) formState.classList.remove('hidden');
+        if (stepTab1) {
+          stepTab1.innerHTML = '<span class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/40 flex items-center justify-center text-[11px] shrink-0">1</span><span>Connect</span>';
+        }
+      }
+    }
+
+    function restoreOnboardingStep() {
+      updateStep1View();
+      if (!ONBOARDING) return;
+      if (ONBOARDING.step === 'otp') showOnboardingStep(2);
+      else if (ONBOARDING.step === 'customizer') showOnboardingStep(3);
+      else if (ONBOARDING.step === 'tutorial') showOnboardingStep(4);
+      else showOnboardingStep(1);
+    }
+
+    function openRemoveAccountModal() {
+      const modal = document.getElementById('removeAccountModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeRemoveAccountModal() {
+      const modal = document.getElementById('removeAccountModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function handleConfirmRemoveAccount() {
+      const btn = document.getElementById('confirmRemoveBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Removing...';
+      }
+      try {
+        const res = await fetch('/api/onboarding/remove-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message || 'Telegram account removed successfully.', 'success');
+          closeRemoveAccountModal();
+          if (ONBOARDING) {
+            ONBOARDING.has_credentials = false;
+            ONBOARDING.has_telegram = false;
+            ONBOARDING.phone_number = '';
+            ONBOARDING.api_id = '';
+            ONBOARDING.telegram_account = {};
+            ONBOARDING.step = 'credentials';
+          }
+          // Reset form inputs
+          const p = document.getElementById('obPhone'); if (p) p.value = '';
+          const aid = document.getElementById('obApiId'); if (aid) aid.value = '';
+          const ah = document.getElementById('obApiHash'); if (ah) ah.value = '';
+          const otp = document.getElementById('obOtpCode'); if (otp) otp.value = '';
+          const p2 = document.getElementById('ob2faPassword'); if (p2) p2.value = '';
+          
+          updateStep1View();
+          showOnboardingStep(1);
+        } else {
+          showToast(data.error || 'Failed to remove Telegram account.', 'error');
+        }
+      } catch (err) {
+        showToast('Network error while removing account.', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Yes, Remove';
+        }
+      }
+    }
+
+    async function handleRequestTelegramCode(e) {
+      e.preventDefault();
+      const btn = document.getElementById('requestOtpBtn');
+      btn.disabled = true;
+      btn.innerText = 'Connecting to Telegram...';
+      try {
+        const res = await fetch('/api/onboarding/request-code', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            phone_number: document.getElementById('obPhone').value,
+            api_id: document.getElementById('obApiId').value,
+            api_hash: document.getElementById('obApiHash').value
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          showOnboardingStep(2);
+        } else {
+          showToast(data.error || 'Failed to send code.', 'error');
+        }
+      } catch (err) {
+        showToast('Connection error.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i> Send Verification Code to Telegram';
+      }
+    }
+
+    async function handleVerifyTelegramCode(e) {
+      e.preventDefault();
+      const code = document.getElementById('obOtpCode').value;
+      const pwd = document.getElementById('ob2faPassword').value;
+      const btn = document.getElementById('verifyOtpBtn');
+      btn.disabled = true;
+      btn.innerText = 'Verifying...';
+      try {
+        const res = await fetch('/api/onboarding/verify-code', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ code, password_2fa: pwd })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          if (ONBOARDING) {
+            ONBOARDING.has_credentials = true;
+            ONBOARDING.has_telegram = true;
+            if (data.data && data.data.tg_username) {
+              ONBOARDING.telegram_account = {
+                username: data.data.tg_username,
+                phone: document.getElementById('obPhone').value
+              };
+            }
+          }
+          updateStep1View();
+          showOnboardingStep(3);
+        } else {
+          if (data.data && data.data.needs_2fa) {
+            document.getElementById('ob2faContainer').classList.remove('hidden');
+            showToast('2-Step Verification password required.', 'info');
+          } else {
+            showToast(data.error || 'Verification failed.', 'error');
+          }
+        }
+      } catch (err) {
+        showToast('Error verifying code.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Verify Account <i class="fa-solid fa-check ml-1"></i>';
+      }
+    }
+
+    async function handleSaveCustomizer(e) {
+      e.preventDefault();
+      try {
+        const sources = document.getElementById('obSources').value.split(',').map(s => s.trim()).filter(Boolean);
+        const isAdmin = CURRENT_USER && CURRENT_USER.role === 'admin';
+        const userLimit = isAdmin ? 9999 : (SUBSCRIPTION && SUBSCRIPTION.channel_limit !== undefined ? SUBSCRIPTION.channel_limit : 1);
+
+        if (!isAdmin && sources.length > userLimit) {
+          showToast(`Plan rule limit exceeded! Your current plan allows copying from up to ${userLimit} source channel${userLimit > 1 ? 's' : ''}. Upgrade your plan to mirror more sources.`, 'error');
+          return;
+        }
+
+        const payload = {
+          sources: document.getElementById('obSources').value,
+          destinations: document.getElementById('obDestinations').value,
+          global_replacement_username: document.getElementById('obReplacementUsername').value,
+          header: document.getElementById('obHeader').value,
+          footer: document.getElementById('obFooter').value,
+          remove_all_urls: document.getElementById('obRemoveUrls').checked,
+          replace_all_usernames: Boolean(document.getElementById('obReplacementUsername').value)
+        };
+        const res = await fetch('/api/onboarding/customizer', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Customizer settings saved!', 'success');
+          showOnboardingStep(4);
+        } else {
+          showToast(data.error || data.message || 'Error saving settings.', 'error');
+        }
+      } catch (err) { showToast('Network error.', 'error'); }
+    }
+
+    async function handleCompleteOnboarding() {
+      const res = await fetch('/api/onboarding/complete', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message, 'success');
+        window.location.href = '/dashboard';
+      }
+    }
+  </script>
+</body>
+</html>

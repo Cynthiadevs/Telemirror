@@ -45,6 +45,7 @@ def parse_str_list(val: str) -> List[str]:
 API_ID_RAW = os.getenv("API_ID", "").strip()
 API_ID = int(API_ID_RAW) if API_ID_RAW.isdigit() else None
 API_HASH = os.getenv("API_HASH", "").strip()
+BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
 PHONE_NUMBER = os.getenv("PHONE_NUMBER", "").strip()
 SESSION_NAME = os.getenv("SESSION_NAME", "telegram_mirror_session").strip()
 SESSION_STRING = os.getenv("SESSION_STRING", "").strip()
@@ -61,6 +62,7 @@ MIRROR_EDITS = os.getenv("MIRROR_EDITS", "false").strip().lower() in ("true", "1
 
 # Filtering and text transformation
 REMOVE_LINKS = os.getenv("REMOVE_LINKS", "false").strip().lower() in ("true", "1", "yes")
+REMOVE_IMAGES = os.getenv("REMOVE_IMAGES", "false").strip().lower() in ("true", "1", "yes")
 REPLACE_MAP = parse_json_dict(os.getenv("REPLACE_MAP", ""))
 BLACKLIST_KEYWORDS = parse_str_list(os.getenv("BLACKLIST_KEYWORDS", ""))
 WHITELIST_KEYWORDS = parse_str_list(os.getenv("WHITELIST_KEYWORDS", ""))

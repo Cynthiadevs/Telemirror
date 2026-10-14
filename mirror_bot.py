@@ -16,7 +16,7 @@ from telethon.tl.types import (
 )
 
 import config
-from cleaner import should_process_message, transform_text
+from cleaner import should_process_message, transform_text, is_image_message
 from album_manager import AlbumManager
 
 # ==============================================================================
@@ -89,17 +89,47 @@ async def copy_single_message(message: Message, dest_entity):
     dest_name = getattr(dest_entity, 'title', str(dest_entity))
     logger.info(f"📤 Processing message #{message.id} -> '{dest_name}'")
 
+    is_image = is_image_message(message)
+
     if config.COPY_MODE == "forward":
-        # Direct Telegram forward (shows forwarded header)
-        sent = await safe_send_action(
-            client.forward_messages,
-            entity=dest_entity,
-            messages=message
-        )
-        return sent
+        if config.REMOVE_IMAGES and is_image:
+            caption_or_text = transform_text(message.raw_text or message.message)
+            if not caption_or_text:
+                logger.info(f"⏭️ Skipping message #{message.id} (Image stripped and no text caption)")
+                return None
+            logger.info(f"🖼️ Removed image on message #{message.id} -> posting text caption only")
+            sent = await safe_send_action(
+                client.send_message,
+                entity=dest_entity,
+                message=caption_or_text,
+                parse_mode='html',
+                link_preview=not config.REMOVE_LINKS
+            )
+            return sent
+        else:
+            sent = await safe_send_action(
+                client.forward_messages,
+                entity=dest_entity,
+                messages=message
+            )
+            return sent
 
     # Clean Copy mode (reposts without forwarded tag)
     caption_or_text = transform_text(message.raw_text or message.message)
+
+    if config.REMOVE_IMAGES and is_image:
+        if not caption_or_text:
+            logger.info(f"⏭️ Skipping message #{message.id} (Image stripped and no text caption)")
+            return None
+        logger.info(f"🖼️ Removed image on message #{message.id} -> posting text caption only")
+        sent = await safe_send_action(
+            client.send_message,
+            entity=dest_entity,
+            message=caption_or_text,
+            parse_mode='html',
+            link_preview=not config.REMOVE_LINKS
+        )
+        return sent
 
     # 1. Message with standard media (photo, video, document, audio, voice, sticker)
     if message.media and not isinstance(message.media, (MessageMediaWebPage, MessageMediaPoll, MessageMediaDice, MessageMediaContact, MessageMediaGeo)):
@@ -164,7 +194,28 @@ async def handle_album_batch(grouped_id: int, messages: List[Message]):
             break
 
     transformed_caption = transform_text(main_caption)
-    media_files = [m.media for m in messages if m.media]
+    
+    if config.REMOVE_IMAGES:
+        non_image_messages = [m for m in messages if not is_image_message(m)]
+        if not non_image_messages:
+            if not transformed_caption:
+                logger.info(f"⏭️ Skipping album group {grouped_id} (All media were images and REMOVE_IMAGES is enabled, no text caption)")
+                return
+            for dest in destinations:
+                dest_name = getattr(dest, 'title', str(dest))
+                logger.info(f"🖼️ Removed all images from album #{grouped_id} -> posting text caption only to '{dest_name}'")
+                await safe_send_action(
+                    client.send_message,
+                    entity=dest,
+                    message=transformed_caption,
+                    parse_mode='html',
+                    link_preview=not config.REMOVE_LINKS
+                )
+            return
+        else:
+            media_files = [m.media for m in non_image_messages if m.media]
+    else:
+        media_files = [m.media for m in messages if m.media]
 
     for dest in destinations:
         dest_name = getattr(dest, 'title', str(dest))
@@ -281,7 +332,10 @@ async def initialize():
     logger.info("=" * 60)
 
     # 1. Connect and authenticate
-    if config.SESSION_STRING:
+    if config.BOT_TOKEN:
+        session = StringSession()
+        logger.info("🤖 Using Bot Token for authentication.")
+    elif config.SESSION_STRING:
         session = StringSession(config.SESSION_STRING)
         logger.info("🔑 Using StringSession for authentication.")
     else:
@@ -295,7 +349,9 @@ async def initialize():
     client.add_event_handler(on_new_message, events.NewMessage)
     client.add_event_handler(on_message_edited, events.MessageEdited)
 
-    if config.SESSION_STRING:
+    if config.BOT_TOKEN:
+        await client.start(bot_token=config.BOT_TOKEN)
+    elif config.SESSION_STRING:
         await client.connect()
         if not await client.is_user_authorized():
             logger.error("❌ Provided SESSION_STRING is not authorized or has expired.")
@@ -304,7 +360,7 @@ async def initialize():
         await client.start(phone=config.PHONE_NUMBER)
 
     me = await client.get_me()
-    logger.info(f"✅ Logged in as: {me.first_name} (@{me.username or 'NoUsername'}) [{me.phone}]")
+    logger.info(f"✅ Logged in as: {me.first_name} (@{me.username or 'NoUsername'}) [ID: {me.id}]")
 
     # 2. Resolve Source Entities
     logger.info("\n🔍 Resolving Source Channels:")

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Support Desk • TeleMirror</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#ecfeff', 100: '#cffafe', 400: '#22d3ee', 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="/static/css/theme.css">
+</head>
+<body class="aceternity-bg text-slate-100 flex flex-col min-h-screen">
+
+  <!-- Top Mobile App Header -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <a href="/dashboard" class="flex items-center gap-2.5 shrink-0 hover:opacity-90 transition">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-500 to-cyan-400 flex items-center justify-center text-white font-black shadow-md shadow-brand-500/25">
+          <i class="fa-brands fa-telegram text-base"></i>
+        </div>
+        <div class="flex items-center">
+          <span class="text-sm font-extrabold tracking-tight">TeleMirror</span>
+        </div>
+      </a>
+
+      <!-- Right: Compact Control Cluster -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Light/Dark Theme" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-amber-400 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-sun" id="themeToggleIcon"></i>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="userHeaderAvatarBtn" title="User Profile" class="hidden relative w-8 h-8 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white text-xs font-extrabold shadow-sm active:scale-95 transition">
+          <span id="userAvatarInitial">U</span>
+          <span id="userAvatarStatusDot" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900"></span>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="mobileMenuBtn" title="Menu" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-cyan-500 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="drawer-content fixed top-0 right-0 bottom-0 w-72 bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 p-5 space-y-5 transform translate-x-full transition-transform duration-300 flex flex-col justify-between overflow-y-auto">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+          <span class="font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-brand-500"></i> Navigation
+          </span>
+          <button onclick="toggleMobileDrawer()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Drawer User Profile Card -->
+        <div id="drawerUserCard" class="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow-md">
+            <span id="drawerAvatarInitial">U</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-sm truncate" id="drawerUserName">User</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="drawerUserEmail">user@example.com</div>
+            <div class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="drawerUserSub">Active Plan</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+          <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-chart-pie w-4 text-center text-cyan-500"></i> Bot Overview
+          </a>
+          <a href="/channels" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-network-wired w-4 text-center text-indigo-500"></i> Channels
+          </a>
+          <a href="/rules" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-purple-500"></i> Rules & Cleaner
+          </a>
+          <a href="/logs" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-terminal w-4 text-center text-emerald-500"></i> Live Bot Logs
+          </a>
+          <a href="/pricing" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-arrow-up-right-dots w-4 text-center text-amber-500"></i> Upgrade Plan
+          </a>
+          <a href="/onboarding" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-sliders w-4 text-center text-brand-500"></i> Setup Wizard
+          </a>
+          <a href="/support" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-brand-600 dark:text-brand-400 font-bold">
+            <i class="fa-solid fa-headset w-4 text-center text-sky-500"></i> Support Desk
+          </a>
+          <a id="drawerAdminBtn" href="/admin" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-bold transition">
+            <i class="fa-solid fa-shield-halved w-4 text-center"></i> Admin CRM Portal
+          </a>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
+        <button onclick="logout()" class="w-full py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-2 hover:bg-rose-500/20 transition">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Support Content -->
+  <main class="app-container space-y-6">
+    
+    <!-- Top Action Banner -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
+          <i class="fa-solid fa-headset text-sky-400"></i> Support Desk & Help Center
+        </h1>
+        <p class="text-xs text-slate-400 mt-0.5">
+          Submit support tickets or join our official Telegram channel for live technical assistance.
+        </p>
+      </div>
+      <button onclick="openNewTicketModal()" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-95 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-brand-500/25 transition">
+        <i class="fa-solid fa-plus"></i> Open Support Ticket
+      </button>
+    </div>
+
+    <!-- Official Telegram Channel Card -->
+    <div class="glass-card rounded-2xl p-5 border-slate-800 bg-gradient-to-r from-sky-950/40 via-slate-900 to-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 flex items-center justify-center text-2xl shrink-0">
+          <i class="fa-brands fa-telegram"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-white">Official Telegram Support Community</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Direct admin assistance, platform announcements, and configuration guides.</p>
+        </div>
+      </div>
+      <a href="https://t.me/telemirror_support" target="_blank" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold text-xs flex items-center gap-2 transition shrink-0">
+        <i class="fa-brands fa-telegram text-sm"></i> Join Telegram Channel
+      </a>
+    </div>
+
+    <!-- My Tickets List Card -->
+    <div class="space-y-3">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+        <i class="fa-solid fa-ticket text-brand-400"></i> My Support Tickets
+      </h2>
+      <div id="userTicketsList" class="space-y-3">
+        <div class="text-xs text-slate-500 text-center py-8">Loading your tickets...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Authenticated User Bottom Dock -->
+  <nav id="userBottomNav" class="fixed bottom-3 inset-x-0 z-40 max-w-lg mx-auto px-3 pb-safe pointer-events-none">
+    <div class="glass-dock pointer-events-auto rounded-3xl p-1.5 flex items-center justify-around">
+      <a href="/dashboard" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/dashboard">
+        <i class="fa-solid fa-chart-pie text-sm"></i>
+        <span class="text-[10px] font-bold">Overview</span>
+      </a>
+      <a href="/channels" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/channels">
+        <i class="fa-solid fa-network-wired text-sm"></i>
+        <span class="text-[10px] font-bold">Channels</span>
+      </a>
+      <a href="/rules" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/rules">
+        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+        <span class="text-[10px] font-bold">Customizer</span>
+      </a>
+      <a href="/logs" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/logs">
+        <i class="fa-solid fa-terminal text-sm"></i>
+        <span class="text-[10px] font-bold">Logs</span>
+      </a>
+      <a href="/pricing" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/pricing">
+        <i class="fa-solid fa-arrow-up-right-dots text-sm text-amber-400"></i>
+        <span class="text-[10px] font-bold">Upgrade</span>
+      </a>
+      <a href="/support" class="dock-item active flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-cyan-400 font-bold transition" data-target="/support">
+        <i class="fa-solid fa-headset text-sm"></i>
+        <span class="text-[10px] font-bold">Support</span>
+      </a>
+      <a id="userBottomAdminBtn" href="/admin" class="hidden dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-purple-400 font-bold transition" data-target="/admin">
+        <i class="fa-solid fa-shield-halved text-sm"></i>
+        <span class="text-[10px] font-bold">Admin</span>
+      </a>
+    </div>
+  </nav>
+
+  <div id="toastContainer" class="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
+
+  <script src="/static/js/app-core.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuthAndSubscription((data) => {
+        if (!data.authenticated) {
+          window.location.href = '/';
+          return;
+        }
+      });
+      await loadUserTickets();
+    });
+
+    async function loadUserTickets() {
+      try {
+        const res = await fetch('/api/support/tickets');
+        const data = await res.json();
+        const list = document.getElementById('userTicketsList');
+        if (data.success && data.tickets.length) {
+          list.innerHTML = data.tickets.map(t => `
+            <div class="glass-card rounded-2xl p-4 sm:p-5 border-slate-800 space-y-2">
+              <div class="flex justify-between items-center">
+                <strong class="text-sm font-bold text-white">${t.subject}</strong>
+                <span class="text-[10px] px-2.5 py-0.5 rounded-full ${t.status === 'open' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'} uppercase font-bold">
+                  ${t.status}
+                </span>
+              </div>
+              <div class="text-xs text-slate-400">Created: ${t.created_at} • ${t.message_count} message(s)</div>
+            </div>
+          `).join('');
+        } else {
+          list.innerHTML = '<div class="text-xs text-slate-500 text-center py-8">You have no active support tickets. Click "Open Support Ticket" above if you need help!</div>';
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function openNewTicketModal() {
+      const subject = prompt('Ticket Subject:');
+      if (!subject) return;
+      const message = prompt('Detailed Message / Question:');
+      if (!message) return;
+      fetch('/api/support/tickets', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ subject, message, priority: 'medium' })
+      }).then(r => r.json()).then(data => {
+        if (data.success) {
+          showToast('Ticket created successfully!', 'success');
+          loadUserTickets();
+        } else {
+          showToast('Failed to create ticket.', 'error');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

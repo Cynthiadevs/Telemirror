@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>TeleMirror Pro • Telegram Channel Automation & Real-Time Cloner</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#ecfeff', 100: '#cffafe', 400: '#22d3ee', 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="/static/css/theme.css">
+</head>
+<body class="aceternity-bg text-slate-100 flex flex-col min-h-screen">
+
+  <!-- Impersonation Banner -->
+  <div id="impersonationBanner" class="hidden bg-gradient-to-r from-amber-600 to-amber-700 text-black px-4 py-2 text-xs font-bold items-center justify-between z-50">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-user-secret text-sm"></i>
+      <span>ADMIN IMPERSONATION: Viewing as <strong id="impersonatedUserName">User</strong></span>
+    </div>
+    <button onclick="exitImpersonation()" class="px-3 py-1 bg-black text-amber-300 rounded-lg text-xs font-bold hover:bg-slate-900 transition">
+      Exit to Admin View
+    </button>
+  </div>
+
+  <!-- Top Mobile App Header -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <a href="/" class="flex items-center gap-2.5 shrink-0 hover:opacity-90 transition">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-500 to-cyan-400 flex items-center justify-center text-white font-black shadow-md shadow-brand-500/25">
+          <i class="fa-brands fa-telegram text-base"></i>
+        </div>
+        <div class="flex items-center">
+          <span class="text-sm font-extrabold tracking-tight">TeleMirror</span>
+        </div>
+      </a>
+
+      <!-- Right: Compact Control Cluster -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Light/Dark Theme" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-amber-400 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-sun" id="themeToggleIcon"></i>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="userHeaderAvatarBtn" title="User Profile" class="hidden relative w-8 h-8 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white text-xs font-extrabold shadow-sm active:scale-95 transition">
+          <span id="userAvatarInitial">U</span>
+          <span id="userAvatarStatusDot" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900"></span>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="mobileMenuBtn" title="Menu" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-cyan-500 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="drawer-content fixed top-0 right-0 bottom-0 w-72 bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 p-5 space-y-5 transform translate-x-full transition-transform duration-300 flex flex-col justify-between overflow-y-auto">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+          <span class="font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-brand-500"></i> Navigation
+          </span>
+          <button onclick="toggleMobileDrawer()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Drawer User Profile Card -->
+        <div id="drawerUserCard" class="hidden p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow-md">
+            <span id="drawerAvatarInitial">U</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-sm truncate" id="drawerUserName">User</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="drawerUserEmail">user@example.com</div>
+            <div class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="drawerUserSub">Active Plan</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+          <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-brand-600 dark:text-brand-400 font-bold">
+            <i class="fa-solid fa-house w-4 text-center text-brand-500"></i> Home
+          </a>
+          <a href="/pricing" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-tags w-4 text-center text-amber-500"></i> Plans & Pricing
+          </a>
+          <div id="drawerUserLinks" class="hidden space-y-1 pt-2 border-t border-slate-200 dark:border-slate-800">
+            <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-chart-pie w-4 text-center text-cyan-500"></i> Bot Overview
+            </a>
+            <a href="/channels" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-network-wired w-4 text-center text-indigo-500"></i> Channels
+            </a>
+            <a href="/rules" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-purple-500"></i> Rules & Cleaner
+            </a>
+            <a href="/logs" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-terminal w-4 text-center text-emerald-500"></i> Live Logs
+            </a>
+            <a href="/support" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+              <i class="fa-solid fa-headset w-4 text-center text-sky-500"></i> Support Desk
+            </a>
+            <a id="drawerAdminBtn" href="/admin" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-bold transition">
+              <i class="fa-solid fa-shield-halved w-4 text-center"></i> Admin CRM Portal
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
+        <div id="drawerAuthActions" class="space-y-2">
+          <button onclick="toggleMobileDrawer(); openAuthModal('login')" class="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-xs">
+            Sign In
+          </button>
+          <button onclick="toggleMobileDrawer(); openAuthModal('register')" class="w-full py-2.5 rounded-xl bg-brand-500 text-white font-bold text-xs shadow-md">
+            Create Account
+          </button>
+        </div>
+        <div id="drawerLogoutAction" class="hidden">
+          <button onclick="logout()" class="w-full py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-2 hover:bg-rose-500/20 transition">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Hero & Landing Content -->
+  <main class="app-container space-y-8">
+    <!-- Hero Section -->
+    <section class="text-center max-w-3xl mx-auto space-y-5">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-semibold">
+        <span class="w-2 h-2 rounded-full bg-brand-400 badge-pulse"></span>
+        TeleMirror Cloud Telegram Forwarder
+      </div>
+      <h1 class="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-tight">
+        Mirror & Automate Telegram Channels in <span class="bg-gradient-to-r from-brand-400 via-sky-300 to-purple-400 bg-clip-text text-transparent">Real Time</span>
+      </h1>
+      <p class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl mx-auto">
+        Clone trading signals, strip competitor watermarks, replace URLs and @usernames with your brand, filter blacklist words, and broadcast to VIP channels with 0-second delay.
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-3 pt-4">
+        <a href="/pricing" class="px-7 py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-cyan-600 hover:from-brand-600 hover:to-cyan-700 text-white font-extrabold text-sm shadow-xl shadow-brand-500/25 transition">
+          <i class="fa-solid fa-rocket mr-2"></i> View Plans & Subscribe
+        </a>
+        <button onclick="openAuthModal('login')" class="px-7 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-sm transition">
+          Sign In to Dashboard
+        </button>
+      </div>
+    </section>
+
+    <!-- Key Features Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div class="glass-card rounded-2xl p-6 border-slate-800 hover:border-brand-500/40 transition">
+        <div class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center text-lg mb-4">
+          <i class="fa-solid fa-filter"></i>
+        </div>
+        <h3 class="text-base font-bold text-white mb-2">Smart Message Cleanser</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Strip competitor usernames, replace links with affiliate referrals, prepend custom headers, and append custom signatures automatically.
+        </p>
+      </div>
+      <div class="glass-card rounded-2xl p-6 border-slate-800 hover:border-purple-500/40 transition">
+        <div class="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-lg mb-4">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <h3 class="text-base font-bold text-white mb-2">Native Album & Media Preserver</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Photo albums, videos, voice notes, stickers, and documents forward seamlessly without layout breakage or losing message groupings.
+        </p>
+      </div>
+      <div class="glass-card rounded-2xl p-6 border-slate-800 hover:border-emerald-500/40 transition">
+        <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg mb-4">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3 class="text-base font-bold text-white mb-2">Isolated Multi-Tenant Security</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Every subscriber operates a distinct private Telegram session worker engine. Full account isolation ensures zero signal leaks.
+        </p>
+      </div>
+    </section>
+
+    <!-- Newsletter Banner -->
+    <section class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div>
+        <h3 class="text-lg font-bold text-white">Subscribe to TeleMirror Insider</h3>
+        <p class="text-xs text-slate-400 mt-1">Get signal strategies, Telegram updates, and exclusive promo codes.</p>
+      </div>
+      <form onsubmit="handleNewsletterSubmit(event)" class="flex flex-col sm:flex-row w-full md:w-auto gap-2">
+        <input type="email" id="newsletterEmail" required placeholder="name@example.com" class="glass-input px-4 py-2.5 rounded-xl text-xs w-full sm:w-72">
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs whitespace-nowrap">
+          Subscribe
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Visitor Bottom Dock (when logged out) -->
+  <nav id="visitorBottomNav" class="fixed bottom-3 inset-x-0 z-40 max-w-sm mx-auto px-3 pb-safe pointer-events-none">
+    <div class="glass-dock pointer-events-auto rounded-3xl p-1.5 flex items-center justify-around">
+      <a href="/" class="dock-item active flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-cyan-400 transition" data-target="/home">
+        <i class="fa-solid fa-house text-sm"></i>
+        <span class="text-[10px] font-bold">Home</span>
+      </a>
+      <a href="/pricing" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/pricing">
+        <i class="fa-solid fa-tags text-sm"></i>
+        <span class="text-[10px] font-bold">Plans</span>
+      </a>
+      <button onclick="openAuthModal('login')" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition">
+        <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
+        <span class="text-[10px] font-bold">Sign In</span>
+      </button>
+      <button onclick="openAuthModal('register')" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-brand-400 font-bold transition">
+        <div class="w-7 h-7 -mt-1 rounded-full bg-brand-500 text-white flex items-center justify-center shadow-md shadow-brand-500/40">
+          <i class="fa-solid fa-user-plus text-xs"></i>
+        </div>
+        <span class="text-[10px]">Register</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Authenticated User Bottom Dock (as v1 floating dock) -->
+  <nav id="userBottomNav" class="hidden fixed bottom-3 inset-x-0 z-40 max-w-lg mx-auto px-3 pb-safe pointer-events-none">
+    <div class="glass-dock pointer-events-auto rounded-3xl p-1.5 flex items-center justify-around">
+      <a href="/dashboard" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/dashboard">
+        <i class="fa-solid fa-chart-pie text-sm"></i>
+        <span class="text-[10px] font-bold">Overview</span>
+      </a>
+      <a href="/channels" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/channels">
+        <i class="fa-solid fa-network-wired text-sm"></i>
+        <span class="text-[10px] font-bold">Channels</span>
+      </a>
+      <a href="/rules" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/rules">
+        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+        <span class="text-[10px] font-bold">Customizer</span>
+      </a>
+      <a href="/logs" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/logs">
+        <i class="fa-solid fa-terminal text-sm"></i>
+        <span class="text-[10px] font-bold">Logs</span>
+      </a>
+      <a href="/pricing" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/pricing">
+        <i class="fa-solid fa-arrow-up-right-dots text-sm text-amber-400"></i>
+        <span class="text-[10px] font-bold">Upgrade</span>
+      </a>
+      <a href="/support" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/support">
+        <i class="fa-solid fa-headset text-sm"></i>
+        <span class="text-[10px] font-bold">Support</span>
+      </a>
+      <a id="userBottomAdminBtn" href="/admin" class="hidden dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-purple-400 font-bold transition" data-target="/admin">
+        <i class="fa-solid fa-shield-halved text-sm"></i>
+        <span class="text-[10px] font-bold">Admin</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="glass-card rounded-t-3xl sm:rounded-2xl max-w-sm w-full p-6 border-slate-700 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex gap-4">
+          <button id="authTabLogin" onclick="switchAuthTab('login')" class="text-sm font-bold text-brand-400 border-b-2 border-brand-500 pb-1">Sign In</button>
+          <button id="authTabRegister" onclick="switchAuthTab('register')" class="text-sm font-bold text-slate-400 hover:text-white pb-1">Register</button>
+        </div>
+        <button onclick="closeAuthModal()" class="w-7 h-7 rounded-lg bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+          <input type="email" id="loginEmail" required class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="name@example.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+          <input type="password" id="loginPassword" required class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md transition">
+          Sign In
+        </button>
+        <div class="text-[11px] text-center text-slate-400 pt-1">Default Super Admin: admin@telemirror.com / admin123</div>
+      </form>
+
+      <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3 hidden">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
+          <input type="text" id="regName" required class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="John Doe">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+          <input type="email" id="regEmail" required class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="name@example.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+          <input type="password" id="regPassword" required minlength="6" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md transition">
+          Create Account & Subscribe
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
+
+  <script src="/static/js/app-core.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuthAndSubscription();
+    });
+
+    async function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('newsletterEmail').value;
+      try {
+        const res = await fetch('/api/newsletter/subscribe', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          document.getElementById('newsletterEmail').value = '';
+        }
+      } catch (e) { showToast('Error subscribing.', 'error'); }
+    }
+  </script>
+</body>
+</html>

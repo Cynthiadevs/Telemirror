@@ -2,26 +2,27 @@
   "telegram": {
     "api_id": "21547934",
     "api_hash": "da2c2ee5b275108baa85ba14117e59ee",
+    "bot_token": "",
     "phone_number": "+2347059866955",
     "session_name": "telegram_mirror_session",
     "session_string": "1AJWap1wBu1oa8zSoZw0pPVgjSpXyIOQdybj_N1bUquFjxzo5VqFUNg4Ij63ctTZ2Lqr4oDuVjFpEo86dUtQ2IRbo79Hc1EZ2QreugCqX-b_GNmDj59Mr-rlAWQh6Go3-CpwX8_D3MpkcHzliZd6sfwMgOXaHiRZEbsJ72zuSeNxH8R1dhc80rkghzFxq2S-rkl729JtEhIzaQE8t8tplX9baoCbngiPfnKDk1CbIkTpprUeOfr1hkAjFx69q4DbE1b1C4_umoB4vFXyxE5WTH-cljVD8Jl2qYFmV7n4aca9WYhDcIAB7eAi2XKwT3S1IiCG72HVEx1K6YiZeiF7RBdTiWIjWwMM="
   },
   "web": {
     "host": "0.0.0.0",
-    "port": 8080,
+    "port": 10000,
     "admin_password": "admin123"
   },
   "bot": {
     "copy_mode": "clean_copy",
-    "action_delay": 2,
+    "action_delay": 2.0,
     "mirror_edits": false,
-    "auto_start": true
+    "auto_start": true,
+    "remove_images": false
   },
   "channels": {
     "sources": [
       "@scotttrad",
-      "@BatmanTraders",
-      "-1001856928123"
+      "@PipTargetSignal"
     ],
     "destinations": [
       "@bsafepocket"
@@ -38,15 +39,16 @@
     "word_rules": [],
     "remove_all_urls": true,
     "remove_all_usernames": false,
+    "remove_images": false,
     "header": "",
     "footer": "",
     "blacklist_keywords": [],
     "whitelist_keywords": []
   },
   "stats": {
-    "total_messages_processed": 1,
-    "total_messages_mirrored": 1,
+    "total_messages_processed": 9,
+    "total_messages_mirrored": 9,
     "total_messages_skipped": 0,
-    "last_mirrored_at": "2026-09-22 06:58:29"
+    "last_mirrored_at": "2026-10-13 13:20:21"
   }
 }

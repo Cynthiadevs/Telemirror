@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Manage Channels • TeleMirror</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#ecfeff', 100: '#cffafe', 400: '#22d3ee', 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="/static/css/theme.css">
+</head>
+<body class="aceternity-bg text-slate-100 flex flex-col min-h-screen">
+
+  <!-- Impersonation Banner -->
+  <div id="impersonationBanner" class="hidden bg-gradient-to-r from-amber-600 to-amber-700 text-black px-4 py-2 text-xs font-bold items-center justify-between z-50">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-user-secret text-sm"></i>
+      <span>ADMIN IMPERSONATION: Viewing as <strong id="impersonatedUserName">User</strong></span>
+    </div>
+    <button onclick="exitImpersonation()" class="px-3 py-1 bg-black text-amber-300 rounded-lg text-xs font-bold hover:bg-slate-900 transition">
+      Exit to Admin View
+    </button>
+  </div>
+
+  <!-- Top Mobile App Header -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <a href="/dashboard" class="flex items-center gap-2.5 shrink-0 hover:opacity-90 transition">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-500 to-cyan-400 flex items-center justify-center text-white font-black shadow-md shadow-brand-500/25">
+          <i class="fa-brands fa-telegram text-base"></i>
+        </div>
+        <div class="flex items-center">
+          <span class="text-sm font-extrabold tracking-tight">TeleMirror</span>
+        </div>
+      </a>
+
+      <!-- Right: Compact Control Cluster -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Light/Dark Theme" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-amber-400 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-sun" id="themeToggleIcon"></i>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="userHeaderAvatarBtn" title="User Profile" class="hidden relative w-8 h-8 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white text-xs font-extrabold shadow-sm active:scale-95 transition">
+          <span id="userAvatarInitial">U</span>
+          <span id="userAvatarStatusDot" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900"></span>
+        </button>
+
+        <button onclick="toggleMobileDrawer()" id="mobileMenuBtn" title="Menu" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:text-cyan-500 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer -->
+  <div id="mobileDrawer" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="drawer-content fixed top-0 right-0 bottom-0 w-72 bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 p-5 space-y-5 transform translate-x-full transition-transform duration-300 flex flex-col justify-between overflow-y-auto">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+          <span class="font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-brand-500"></i> Navigation
+          </span>
+          <button onclick="toggleMobileDrawer()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Drawer User Profile Card -->
+        <div id="drawerUserCard" class="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow-md">
+            <span id="drawerAvatarInitial">U</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-sm truncate" id="drawerUserName">User</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="drawerUserEmail">user@example.com</div>
+            <div class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="drawerUserSub">Active Plan</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+          <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-chart-pie w-4 text-center text-cyan-500"></i> Bot Overview
+          </a>
+          <a href="/channels" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-brand-600 dark:text-brand-400 font-bold">
+            <i class="fa-solid fa-network-wired w-4 text-center text-indigo-500"></i> Channel Manager
+          </a>
+          <a href="/rules" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-wand-magic-sparkles w-4 text-center text-purple-500"></i> Rules & Cleaner
+          </a>
+          <a href="/logs" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-terminal w-4 text-center text-emerald-500"></i> Live Bot Logs
+          </a>
+          <a href="/pricing" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-arrow-up-right-dots w-4 text-center text-amber-500"></i> Upgrade Plan
+          </a>
+          <a href="/onboarding" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-sliders w-4 text-center text-brand-500"></i> Setup Wizard
+          </a>
+          <a href="/support" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition">
+            <i class="fa-solid fa-headset w-4 text-center text-sky-500"></i> Support Desk
+          </a>
+          <a id="drawerAdminBtn" href="/admin" class="hidden flex items-center gap-3 px-3 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-bold transition">
+            <i class="fa-solid fa-shield-halved w-4 text-center"></i> Admin CRM Portal
+          </a>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
+        <button onclick="logout()" class="w-full py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-2 hover:bg-rose-500/20 transition">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Channels Content -->
+  <main class="app-container space-y-5">
+    
+    <!-- Breadcrumb & Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
+          <i class="fa-solid fa-network-wired text-brand-400"></i> Channel Management
+        </h1>
+        <p class="text-xs text-slate-400 mt-0.5">
+          Scan your connected Telegram account to automatically select signal sources and VIP destination channels.
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="fetchTelegramDialogs()" class="px-3.5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-md shadow-brand-500/20 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-arrows-rotate"></i> Scan My Channels
+        </button>
+        <a href="/pricing" class="px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold hover:bg-amber-500/20 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-up text-[11px]"></i> Upgrade Quota
+        </a>
+      </div>
+    </div>
+
+    <!-- Active Quota Status & Plan Banner -->
+    <div id="channelQuotaBanner" class="glass-card rounded-2xl p-4 sm:p-5 border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-lg shrink-0">
+          <i class="fa-solid fa-satellite-dish"></i>
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs text-slate-400 font-semibold">Active Tier:</span>
+            <span id="planNameDisplay" class="text-xs font-extrabold text-brand-400">Starter Plan</span>
+            <span id="planQuotaBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 font-bold">
+              0 / 1 Sources Used
+            </span>
+          </div>
+          <p id="planQuotaDesc" class="text-xs text-slate-300 mt-1">
+            Your current plan allows mirroring signals from up to <strong>1 source channel</strong>. No manual override permitted.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 w-full md:w-auto">
+        <div class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-center flex-1 md:flex-none">
+          <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Sources</div>
+          <div id="sourcesCounter" class="text-base font-black text-cyan-400">0</div>
+        </div>
+        <div class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-center flex-1 md:flex-none">
+          <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Destinations</div>
+          <div id="destinationsCounter" class="text-base font-black text-purple-400">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Channels Summary Cards (Sources & Destinations) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      
+      <!-- Selected Sources Card -->
+      <div class="glass-card rounded-2xl p-5 border-slate-800 space-y-3">
+        <div class="flex justify-between items-center border-b border-slate-800/80 pb-2.5">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-satellite-dish text-cyan-400 text-sm"></i>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-white">Active Sources (Mirror From)</h2>
+          </div>
+          <span id="sourcesCountPill" class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-bold">0 Selected</span>
+        </div>
+        <p class="text-[11px] text-slate-400">Signals from these channels will be received, cleansed, and forwarded.</p>
+        
+        <div id="selectedSourcesContainer" class="min-h-[70px] flex flex-wrap gap-2 items-center">
+          <div class="text-xs text-slate-500 italic py-2">No source channels selected yet. Click "+ Source" from the scanner below.</div>
+        </div>
+      </div>
+
+      <!-- Selected Destinations Card -->
+      <div class="glass-card rounded-2xl p-5 border-slate-800 space-y-3">
+        <div class="flex justify-between items-center border-b border-slate-800/80 pb-2.5">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-bullhorn text-purple-400 text-sm"></i>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-white">Active Destinations (Post Into)</h2>
+          </div>
+          <span id="destinationsCountPill" class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold">0 Selected</span>
+        </div>
+        <p class="text-[11px] text-slate-400">Transformed signals will be posted into these VIP output channels.</p>
+
+        <div id="selectedDestinationsContainer" class="min-h-[70px] flex flex-wrap gap-2 items-center">
+          <div class="text-xs text-slate-500 italic py-2">No destination channels selected yet. Click "+ Destination" from the scanner below.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Telegram Channel Explorer & Auto-Scanner (Core Feature) -->
+    <div class="glass-card rounded-2xl p-5 border-slate-800 space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-brands fa-telegram text-sky-400 text-base"></i>
+            <span>Connected Telegram Channels</span>
+            <span id="scanResultsBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-bold hidden">0 Found</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Click "+ Source" or "+ Destination" to automatically add channels without typing usernames or IDs.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button id="scanBtn" onclick="fetchTelegramDialogs()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-white flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-arrows-rotate" id="scanIcon"></i>
+            <span>Scan Channels</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Category Filters -->
+      <div class="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+          <input type="text" id="channelSearchInput" oninput="filterChannelsList()" placeholder="Filter scanned channels by name, username, or ID..." class="glass-input w-full pl-9 pr-3 py-2 rounded-xl text-xs">
+        </div>
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 shrink-0">
+          <button onclick="setFilterCategory('all')" class="cat-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white transition" data-cat="all">All</button>
+          <button onclick="setFilterCategory('channels')" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="channels">Channels</button>
+          <button onclick="setFilterCategory('groups')" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="groups">Groups</button>
+          <button onclick="setFilterCategory('admin')" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="admin">Admin / Post Rights</button>
+        </div>
+      </div>
+
+      <!-- Telegram Account Not Connected Alert -->
+      <div id="tgNotConnectedCard" class="hidden p-5 rounded-2xl bg-gradient-to-r from-sky-950/40 via-slate-900 to-slate-900 border border-sky-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-brands fa-telegram"></i>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-white">Telegram Account Not Connected Yet</div>
+            <div class="text-[11px] text-slate-300 mt-0.5">
+              To automatically scan and select channels from your Telegram account, complete the Telegram setup wizard.
+            </div>
+          </div>
+        </div>
+        <a href="/onboarding" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-md transition">
+          <span>Connect Telegram</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- Channels List Container -->
+      <div id="dialogsList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+        <div class="text-xs text-slate-500 text-center py-10 flex flex-col items-center gap-2">
+          <i class="fa-solid fa-satellite-dish text-2xl text-slate-600"></i>
+          <span>Click "Scan Channels" above to discover channels from your connected Telegram account.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Manual Identifier Input (Collapsible Accordion) -->
+    <div class="glass-card rounded-2xl p-4 sm:p-5 border-slate-800">
+      <button onclick="toggleManualAccordion()" class="w-full flex items-center justify-between text-left text-xs font-bold text-slate-300 hover:text-white transition">
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-keyboard text-brand-400"></i>
+          <span>Can't find a channel? Add Custom Channel Identifier or Private Link</span>
+        </span>
+        <i id="manualAccordionChevron" class="fa-solid fa-chevron-down text-slate-500 transition-transform"></i>
+      </button>
+
+      <div id="manualAccordionBody" class="hidden pt-4 space-y-3 border-t border-slate-800/80 mt-3">
+        <p class="text-[11px] text-slate-400">
+          Enter a public Telegram username (e.g. <code>@crypto_signals</code>) or private channel ID (e.g. <code>-1001234567890</code>):
+        </p>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input type="text" id="manualChannelInput" placeholder="@channel_username or -1001234567890" class="glass-input flex-1 px-3.5 py-2.5 rounded-xl text-xs font-mono">
+          <div class="flex gap-2">
+            <button onclick="addManualChannel('source')" class="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
+              <i class="fa-solid fa-satellite-dish text-xs"></i> + As Source
+            </button>
+            <button onclick="addManualChannel('destination')" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
+              <i class="fa-solid fa-bullhorn text-xs"></i> + As Destination
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Plan Limit Reached Modal -->
+  <div id="planLimitModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-md w-full p-6 border-amber-500/40 space-y-4 shadow-2xl">
+      <div class="flex items-start justify-between">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl shrink-0">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <button onclick="closePlanLimitModal()" class="w-7 h-7 rounded-lg bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-base font-extrabold text-white">Channel Limit Reached</h3>
+        <p id="planLimitModalMsg" class="text-xs text-slate-300 leading-relaxed">
+          Your current plan allows mirroring from up to <strong>1 source channel</strong>. Upgrade your plan to add more source channels.
+        </p>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs space-y-2">
+        <div class="font-bold text-white flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-up-right-dots text-brand-400"></i> Available Upgrades:
+        </div>
+        <ul class="space-y-1 text-slate-300 text-[11px]">
+          <li>• <strong class="text-white">Pro Trader:</strong> Up to <strong>3 Source Channels</strong> (₦25,000 / month)</li>
+          <li>• <strong class="text-white">Enterprise:</strong> Up to <strong>10 Source Channels</strong> (₦60,000 / 90 days)</li>
+        </ul>
+      </div>
+
+      <div class="flex gap-2.5 pt-1">
+        <button onclick="closePlanLimitModal()" class="flex-1 py-2.5 rounded-xl bg-slate-900 text-slate-300 font-semibold text-xs hover:bg-slate-800 transition">
+          Stay on Current Plan
+        </button>
+        <a href="/pricing" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 text-black font-extrabold text-xs text-center shadow-lg transition">
+          Upgrade Now <i class="fa-solid fa-arrow-up ml-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authenticated User Bottom Dock -->
+  <nav id="userBottomNav" class="fixed bottom-3 inset-x-0 z-40 max-w-lg mx-auto px-3 pb-safe pointer-events-none">
+    <div class="glass-dock pointer-events-auto rounded-3xl p-1.5 flex items-center justify-around">
+      <a href="/dashboard" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/dashboard">
+        <i class="fa-solid fa-chart-pie text-sm"></i>
+        <span class="text-[10px] font-bold">Overview</span>
+      </a>
+      <a href="/channels" class="dock-item active flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-cyan-400 font-bold transition" data-target="/channels">
+        <i class="fa-solid fa-network-wired text-sm"></i>
+        <span class="text-[10px] font-bold">Channels</span>
+      </a>
+      <a href="/rules" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/rules">
+        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+        <span class="text-[10px] font-bold">Customizer</span>
+      </a>
+      <a href="/logs" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/logs">
+        <i class="fa-solid fa-terminal text-sm"></i>
+        <span class="text-[10px] font-bold">Logs</span>
+      </a>
+      <a href="/pricing" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/pricing">
+        <i class="fa-solid fa-arrow-up-right-dots text-sm text-amber-400"></i>
+        <span class="text-[10px] font-bold">Upgrade</span>
+      </a>
+      <a href="/support" class="dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-slate-400 hover:text-white transition" data-target="/support">
+        <i class="fa-solid fa-headset text-sm"></i>
+        <span class="text-[10px] font-bold">Support</span>
+      </a>
+      <a id="userBottomAdminBtn" href="/admin" class="hidden dock-item flex-1 py-2 px-1 flex flex-col items-center gap-1 rounded-2xl text-purple-400 font-bold transition" data-target="/admin">
+        <i class="fa-solid fa-shield-halved text-sm"></i>
+        <span class="text-[10px] font-bold">Admin</span>
+      </a>
+    </div>
+  </nav>
+
+  <div id="toastContainer" class="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
+
+  <script src="/static/js/app-core.js"></script>
+  <script>
+    let CURRENT_SOURCES = [];
+    let CURRENT_DESTINATIONS = [];
+    let SCANNED_DIALOGS = [];
+    let CURRENT_CAT_FILTER = 'all';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuthAndSubscription((data) => {
+        if (!data.authenticated) {
+          window.location.href = '/';
+          return;
+        }
+        if (!data.subscription || !data.subscription.is_subscribed) {
+          window.location.href = '/pricing';
+          return;
+        }
+      });
+      await loadUserChannels();
+      // Automatically attempt initial scan on load
+      fetchTelegramDialogs(true);
+    });
+
+    async function loadUserChannels() {
+      try {
+        const res = await fetch('/api/user/config');
+        const cfg = await res.json();
+        const ch = cfg.channels || {};
+        CURRENT_SOURCES = ch.sources || [];
+        CURRENT_DESTINATIONS = ch.destinations || [];
+
+        renderSelectedChannels();
+        updateQuotaDisplays();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateQuotaDisplays() {
+      const isAdmin = CURRENT_USER && CURRENT_USER.role === 'admin';
+      const userLimit = isAdmin ? 9999 : (SUBSCRIPTION && SUBSCRIPTION.channel_limit !== undefined ? SUBSCRIPTION.channel_limit : 1);
+      const planName = (SUBSCRIPTION && SUBSCRIPTION.plan_name) || 'Current Plan';
+      const count = CURRENT_SOURCES.length;
+
+      document.getElementById('planNameDisplay').innerText = planName;
+      document.getElementById('sourcesCounter').innerText = count;
+      document.getElementById('destinationsCounter').innerText = CURRENT_DESTINATIONS.length;
+      document.getElementById('sourcesCountPill').innerText = `${count} Selected`;
+      document.getElementById('destinationsCountPill').innerText = `${CURRENT_DESTINATIONS.length} Selected`;
+
+      const quotaBadge = document.getElementById('planQuotaBadge');
+      const quotaDesc = document.getElementById('planQuotaDesc');
+
+      if (isAdmin) {
+        quotaBadge.innerText = `${count} / ∞ Channels (Admin)`;
+        quotaBadge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold';
+        quotaDesc.innerHTML = 'You have <strong>Super Admin privileges</strong> with unlimited source channel allocations.';
+      } else {
+        quotaBadge.innerText = `${count} / ${userLimit} Sources Used`;
+        if (count >= userLimit) {
+          quotaBadge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold';
+          quotaDesc.innerHTML = `Your plan limit of <strong>${userLimit} source channel${userLimit > 1 ? 's' : ''}</strong> is reached. To copy from more channels, <a href="/pricing" class="text-amber-400 underline font-bold">upgrade your tier</a>.`;
+        } else {
+          quotaBadge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 font-bold';
+          quotaDesc.innerHTML = `You have used <strong>${count} of ${userLimit}</strong> allowed source channels.`;
+        }
+      }
+    }
+
+    function renderSelectedChannels() {
+      // Sources
+      const srcContainer = document.getElementById('selectedSourcesContainer');
+      if (CURRENT_SOURCES.length === 0) {
+        srcContainer.innerHTML = '<div class="text-xs text-slate-500 italic py-2">No sources selected yet. Tap "+ Source" on any scanned channel below.</div>';
+      } else {
+        srcContainer.innerHTML = CURRENT_SOURCES.map(s => `
+          <div class="px-2.5 py-1.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 text-xs flex items-center gap-2 group transition">
+            <i class="fa-solid fa-satellite-dish text-[11px] text-cyan-400"></i>
+            <span class="font-mono font-bold">${escapeHtml(s)}</span>
+            <button onclick="toggleChannel('source', '${escapeHtml(s)}', 'remove')" title="Remove source" class="w-4 h-4 rounded-full bg-cyan-900/60 text-cyan-300 hover:bg-rose-600 hover:text-white flex items-center justify-center text-[10px] transition">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // Destinations
+      const destContainer = document.getElementById('selectedDestinationsContainer');
+      if (CURRENT_DESTINATIONS.length === 0) {
+        destContainer.innerHTML = '<div class="text-xs text-slate-500 italic py-2">No destinations selected yet. Tap "+ Destination" on any scanned channel below.</div>';
+      } else {
+        destContainer.innerHTML = CURRENT_DESTINATIONS.map(d => `
+          <div class="px-2.5 py-1.5 rounded-xl bg-purple-950/60 border border-purple-500/40 text-purple-300 text-xs flex items-center gap-2 group transition">
+            <i class="fa-solid fa-bullhorn text-[11px] text-purple-400"></i>
+            <span class="font-mono font-bold">${escapeHtml(d)}</span>
+            <button onclick="toggleChannel('destination', '${escapeHtml(d)}', 'remove')" title="Remove destination" class="w-4 h-4 rounded-full bg-purple-900/60 text-purple-300 hover:bg-rose-600 hover:text-white flex items-center justify-center text-[10px] transition">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // Re-render scanned list buttons states
+      renderScannedDialogs();
+    }
+
+    async function fetchTelegramDialogs(isInitialSilent = false) {
+      const list = document.getElementById('dialogsList');
+      const scanIcon = document.getElementById('scanIcon');
+      const scanBtn = document.getElementById('scanBtn');
+      const notConnCard = document.getElementById('tgNotConnectedCard');
+      const resultsBadge = document.getElementById('scanResultsBadge');
+
+      if (scanIcon) scanIcon.className = 'fa-solid fa-arrows-rotate fa-spin text-brand-400';
+      if (scanBtn) scanBtn.disabled = true;
+
+      if (!isInitialSilent) {
+        list.innerHTML = `
+          <div class="text-xs text-brand-400 py-8 text-center space-y-2">
+            <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+            <div>Scanning channels from your Telegram session...</div>
+          </div>
+        `;
+      }
+
+      try {
+        const res = await fetch('/api/user/dialogs');
+        const data = await res.json();
+
+        if (scanIcon) scanIcon.className = 'fa-solid fa-arrows-rotate';
+        if (scanBtn) scanBtn.disabled = false;
+
+        if (data.connected === false) {
+          if (notConnCard) notConnCard.classList.remove('hidden');
+          list.innerHTML = `
+            <div class="text-xs text-slate-500 text-center py-8">
+              No connected Telegram account. Complete setup to scan channels.
+            </div>
+          `;
+          return;
+        }
+
+        if (notConnCard) notConnCard.classList.add('hidden');
+
+        if (data.success && data.dialogs && data.dialogs.length) {
+          SCANNED_DIALOGS = data.dialogs;
+          if (resultsBadge) {
+            resultsBadge.innerText = `${SCANNED_DIALOGS.length} Found`;
+            resultsBadge.classList.remove('hidden');
+          }
+          renderScannedDialogs();
+          if (!isInitialSilent) {
+            showToast(`Found ${SCANNED_DIALOGS.length} Telegram channels and groups!`, 'success');
+          }
+        } else {
+          SCANNED_DIALOGS = [];
+          list.innerHTML = `
+            <div class="text-xs text-slate-500 text-center py-8 space-y-2">
+              <i class="fa-solid fa-circle-exclamation text-xl text-amber-500"></i>
+              <div>No channels found in this account, or Telegram rate limit encountered.</div>
+              <div class="text-[11px] text-slate-400">You can also add custom channels manually using the section below.</div>
+            </div>
+          `;
+        }
+      } catch (e) {
+        if (scanIcon) scanIcon.className = 'fa-solid fa-arrows-rotate';
+        if (scanBtn) scanBtn.disabled = false;
+        list.innerHTML = `
+          <div class="text-xs text-rose-400 text-center py-6">
+            Error scanning dialogs. Check connection and retry.
+          </div>
+        `;
+      }
+    }
+
+    function renderScannedDialogs() {
+      const list = document.getElementById('dialogsList');
+      if (!list || !SCANNED_DIALOGS.length) return;
+
+      const query = (document.getElementById('channelSearchInput').value || '').toLowerCase().trim();
+
+      const filtered = SCANNED_DIALOGS.filter(d => {
+        // Category filter
+        if (CURRENT_CAT_FILTER === 'channels' && !d.is_channel) return false;
+        if (CURRENT_CAT_FILTER === 'groups' && !d.is_group) return false;
+        if (CURRENT_CAT_FILTER === 'admin' && !(d.is_creator || d.is_admin || d.can_post)) return false;
+
+        // Search text
+        if (!query) return true;
+        const title = (d.title || '').toLowerCase();
+        const ident = (d.identifier || '').toLowerCase();
+        return title.includes(query) || ident.includes(query);
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="text-xs text-slate-500 text-center py-8">
+            No channels match your current search/filter.
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = filtered.map(d => {
+        const ident = d.identifier;
+        const isSource = CURRENT_SOURCES.includes(ident);
+        const isDest = CURRENT_DESTINATIONS.includes(ident);
+
+        // Tags
+        let typeBadge = d.is_broadcast ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 font-bold">Broadcast</span>' :
+                        d.is_group ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-bold">Group</span>' :
+                        '<span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-bold">Channel</span>';
+
+        let adminBadge = d.is_creator ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold">Creator</span>' :
+                         d.is_admin ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 font-bold">Admin</span>' : '';
+
+        return `
+          <div class="p-3.5 glass-card rounded-2xl border ${isSource || isDest ? 'border-brand-500/40 bg-slate-900/90' : 'border-slate-800 hover:border-slate-700'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition">
+            
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <div class="w-10 h-10 rounded-xl ${d.is_broadcast ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20' : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'} flex items-center justify-center text-sm shrink-0">
+                <i class="fa-solid ${d.is_broadcast ? 'fa-bullhorn' : 'fa-users'}"></i>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <strong class="text-white text-xs font-bold truncate max-w-[240px] sm:max-w-xs">${escapeHtml(d.title)}</strong>
+                  ${typeBadge}
+                  ${adminBadge}
+                  ${isSource ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-bold flex items-center gap-1"><i class="fa-solid fa-satellite-dish"></i> In Sources</span>' : ''}
+                  ${isDest ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 font-bold flex items-center gap-1"><i class="fa-solid fa-bullhorn"></i> In Destinations</span>' : ''}
+                </div>
+                <div class="text-[11px] text-slate-400 font-mono mt-0.5 truncate">${escapeHtml(ident)}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 pt-1 sm:pt-0">
+              
+              <!-- Add/Remove Source Button -->
+              ${isSource ? `
+                <button onclick="toggleChannel('source', '${escapeHtml(ident)}', 'remove')" class="flex-1 sm:flex-none px-3 py-1.5 rounded-xl bg-cyan-500 text-black font-extrabold text-[11px] hover:bg-cyan-400 transition flex items-center justify-center gap-1 shadow-sm">
+                  <i class="fa-solid fa-check text-[10px]"></i>
+                  <span>Source</span>
+                  <i class="fa-solid fa-xmark text-[9px] ml-1 opacity-70"></i>
+                </button>
+              ` : `
+                <button onclick="toggleChannel('source', '${escapeHtml(ident)}', 'add')" class="flex-1 sm:flex-none px-3 py-1.5 rounded-xl bg-slate-900 border border-cyan-500/40 text-cyan-300 font-bold text-[11px] hover:bg-cyan-500 hover:text-black transition flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-plus text-[10px]"></i>
+                  <span>Source</span>
+                </button>
+              `}
+
+              <!-- Add/Remove Destination Button -->
+              ${isDest ? `
+                <button onclick="toggleChannel('destination', '${escapeHtml(ident)}', 'remove')" class="flex-1 sm:flex-none px-3 py-1.5 rounded-xl bg-purple-500 text-white font-extrabold text-[11px] hover:bg-purple-400 transition flex items-center justify-center gap-1 shadow-sm">
+                  <i class="fa-solid fa-check text-[10px]"></i>
+                  <span>Destination</span>
+                  <i class="fa-solid fa-xmark text-[9px] ml-1 opacity-70"></i>
+                </button>
+              ` : `
+                <button onclick="toggleChannel('destination', '${escapeHtml(ident)}', 'add')" class="flex-1 sm:flex-none px-3 py-1.5 rounded-xl bg-slate-900 border border-purple-500/40 text-purple-300 font-bold text-[11px] hover:bg-purple-600 hover:text-white transition flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-plus text-[10px]"></i>
+                  <span>Destination</span>
+                </button>
+              `}
+
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function toggleChannel(type, identifier, action) {
+      const isAdmin = CURRENT_USER && CURRENT_USER.role === 'admin';
+      const userLimit = isAdmin ? 9999 : (SUBSCRIPTION && SUBSCRIPTION.channel_limit !== undefined ? SUBSCRIPTION.channel_limit : 1);
+      const planName = (SUBSCRIPTION && SUBSCRIPTION.plan_name) || 'Current Plan';
+
+      if (type === 'source' && action === 'add' && !isAdmin && CURRENT_SOURCES.length >= userLimit) {
+        showPlanLimitModal(planName, userLimit);
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/user/channels/toggle', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ type, identifier, action })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          CURRENT_SOURCES = data.sources || [];
+          CURRENT_DESTINATIONS = data.destinations || [];
+          renderSelectedChannels();
+          updateQuotaDisplays();
+          showToast(data.message || 'Updated channels.', 'success');
+        } else if (data.limit_reached) {
+          showPlanLimitModal(data.plan_name || planName, data.limit || userLimit);
+        } else {
+          showToast(data.error || 'Failed to update channel.', 'error');
+        }
+      } catch (err) {
+        showToast('Error syncing channel change.', 'error');
+      }
+    }
+
+    function addManualChannel(type) {
+      const input = document.getElementById('manualChannelInput');
+      const val = (input.value || '').trim();
+      if (!val) {
+        showToast('Please enter a channel username or ID.', 'error');
+        return;
+      }
+      toggleChannel(type, val, 'add');
+      input.value = '';
+    }
+
+    function filterChannelsList() {
+      renderScannedDialogs();
+    }
+
+    function setFilterCategory(cat) {
+      CURRENT_CAT_FILTER = cat;
+      document.querySelectorAll('.cat-filter-btn').forEach(b => {
+        if (b.dataset.cat === cat) {
+          b.className = 'cat-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white transition';
+        } else {
+          b.className = 'cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition';
+        }
+      });
+      renderScannedDialogs();
+    }
+
+    function toggleManualAccordion() {
+      const body = document.getElementById('manualAccordionBody');
+      const chev = document.getElementById('manualAccordionChevron');
+      if (body.classList.contains('hidden')) {
+        body.classList.remove('hidden');
+        chev.classList.add('rotate-180');
+      } else {
+        body.classList.add('hidden');
+        chev.classList.remove('rotate-180');
+      }
+    }
+
+    function showPlanLimitModal(planName, limit) {
+      const modal = document.getElementById('planLimitModal');
+      const msg = document.getElementById('planLimitModalMsg');
+      if (msg) {
+        msg.innerHTML = `Your <strong>${escapeHtml(planName)}</strong> allows mirroring from at most <strong>${limit} source channel${limit > 1 ? 's' : ''}</strong>. You have already reached this quota. To add more channels, upgrade to Pro Trader (3 channels) or Enterprise (10 channels).`;
+      }
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closePlanLimitModal() {
+      const modal = document.getElementById('planLimitModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

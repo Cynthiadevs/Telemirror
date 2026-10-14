@@ -27,7 +27,7 @@ def print_banner(host: str, port: int):
     local_ip = get_local_ip()
     border = "=" * 62
     print(f"\n{border}")
-    print("   🚀 TeleMirror Pro • Web Admin & Telegram Bot Engine")
+    print("   🚀 TeleMirror • Multi-Tenant SaaS & Telegram Engine")
     print(border)
     print(f"   🌐 Local Access:    http://localhost:{port}")
     if local_ip != "127.0.0.1":
@@ -51,4 +51,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(start_web_server())
     except (KeyboardInterrupt, SystemExit):
-        print("\n👋 TeleMirror Pro stopped cleanly.")
+        print("\n👋 TeleMirror stopped cleanly.")

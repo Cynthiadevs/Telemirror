@@ -1,0 +1,19 @@
+ Press Ctrl+C in this terminal to stop the server.
+==============================================================
+
+2026-09-22 14:37:35,067 [INFO] WebServer: 🌐 Web Admin Dashboard running at http://0.0.0.0:8080
+2026-09-22 14:37:35,067 [INFO] BotEngine: 🚀 Starting Bot Engine...
+2026-09-22 14:37:35,068 [INFO] BotEngine: 🔑 Starting with StringSession (Headless Cloud Userbot)...
+2026-09-22 14:37:35,069 [INFO] telethon.network.mtprotosender: Connecting to 149.154.167.92:443/TcpFull...
+2026-09-22 14:37:35,246 [INFO] telethon.network.mtprotosender: Connection to 149.154.167.92:443/TcpFull complete!
+2026-09-22 14:37:36,416 [INFO] BotEngine: ✅ Connected as: BadPersin (@badpersinceo) [ID: 6704666698]
+2026-09-22 14:37:36,623 [INFO] BotEngine: 📥 Source resolved: Scott Reyes | Trade your future📈 (ID: 2174497780)
+2026-09-22 14:37:36,853 [INFO] BotEngine: 📤 Destination resolved: BSAFE POCKET (ID: 4476226345)
+2026-09-22 14:37:36,855 [INFO] BotEngine: ✨ Bot Engine is active and listening for messages.
+
+2026-09-22 14:52:15,318 [INFO] telethon.client.updates: Got difference for account updates
+2026-09-22 14:56:25,523 [INFO] telethon.client.updates: Got difference for account updates
+2026-09-22 14:56:25,884 [INFO] telethon.client.updates: Got difference for channel 1856928123 updates
+2026-09-22 14:56:39,437 [INFO] telethon.client.updates: Got difference for channel 1856928123 updates
+2026-09-22 15:11:25,725 [INFO] telethon.client.updates: Got difference for account updates
+2026-09-22 15:11:39,630 [INFO] telethon.client.updates: Got difference for channel 1856928123 updates

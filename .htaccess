@@ -1,0 +1,18 @@
+# TeleMirror - cPanel / Apache Reverse Proxy Configuration
+# Proxies requests from your domain/subdomain to the local Python server running on port 10000
+
+RewriteEngine On
+
+# 1. Forward WebSockets for live terminal logs (/ws/logs and /ws/user/logs)
+RewriteCond %{HTTP:Upgrade} =websocket [NC]
+RewriteCond %{HTTP:Connection} =Upgrade [NC]
+RewriteRule ^ws/(.*)$ ws://127.0.0.1:10000/ws/$1 [P,L]
+
+# 2. Forward all standard HTTP requests to the running TeleMirror server
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ http://127.0.0.1:10000/$1 [P,L]
+
+# Ensure proxy headers are preserved
+RequestHeader set X-Forwarded-Proto "https" env=HTTPS
+RequestHeader set X-Real-IP "%{REMOTE_ADDR}s"

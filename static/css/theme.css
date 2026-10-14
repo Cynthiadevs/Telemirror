@@ -1,0 +1,518 @@
+/**
+ * TeleMirror Pro v2 - Global Theme Engine & Mobile App UI Stylesheet
+ * Complete Light & Dark Mode styling for all pages, modals, drawers, bottom dock, and admin portal.
+ */
+
+:root {
+  --bg-primary: #f8fafc;
+  --bg-mesh: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-inner: #f8fafc;
+  --border-color: #e2e8f0;
+  --border-subtle: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --dock-bg: rgba(255, 255, 255, 0.95);
+  --dock-border: #e2e8f0;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-text: #0f172a;
+  --drawer-bg: #ffffff;
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+}
+
+html.dark {
+  --bg-primary: #030712;
+  --bg-mesh: #090d16;
+  --bg-card: rgba(15, 23, 42, 0.85);
+  --bg-card-inner: rgba(15, 23, 42, 0.92);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --dock-bg: rgba(15, 23, 42, 0.92);
+  --dock-border: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(15, 23, 42, 0.7);
+  --input-border: rgba(255, 255, 255, 0.12);
+  --input-text: #ffffff;
+  --drawer-bg: #030712;
+  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Base Body */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Background Mesh */
+.aceternity-bg {
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.07) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.07) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(14, 116, 144, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+html.dark .aceternity-bg {
+  background-color: #030712;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.12) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(14, 116, 144, 0.08) 0px, transparent 50%),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+}
+
+/* Glass Card */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+}
+
+/* Bottom Glass Dock */
+.glass-dock {
+  background: var(--dock-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--dock-border);
+  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.12);
+}
+
+html.dark .glass-dock {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Glass Inputs */
+.glass-input, input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.glass-input:focus, input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+}
+
+/* Compact Responsive App Header */
+.app-header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+}
+
+.app-header-inner {
+  max-width: 56rem; /* 896px - max-w-4xl */
+  margin: 0 auto;
+  width: 100%;
+  height: 56px;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.admin-header-inner {
+  max-width: 80rem; /* 1280px */
+  margin: 0 auto;
+  width: 100%;
+  height: 56px;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .app-header-inner {
+    padding: 0 1.5rem;
+  }
+  .admin-header-inner {
+    padding: 0 1.5rem;
+  }
+}
+
+/* App Main Container: Perfectly Centered, Never Scattered */
+.app-container {
+  max-width: 56rem; /* 896px */
+  margin: 0 auto;
+  width: 100%;
+  padding: 1.25rem 1rem 6.5rem 1rem;
+  flex: 1;
+}
+
+@media (min-width: 640px) {
+  .app-container {
+    padding: 1.5rem 1.5rem 7rem 1.5rem;
+  }
+}
+
+/* Mobile Slide-Over Drawer */
+.drawer-content {
+  background-color: var(--drawer-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Light Mode Overrides for Hardcoded Dark Utility Classes */
+html:not(.dark) .text-white {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .text-slate-100 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .text-slate-200 {
+  color: #1e293b !important;
+}
+
+html:not(.dark) .text-slate-300 {
+  color: #334155 !important;
+}
+
+html:not(.dark) .text-slate-400 {
+  color: #64748b !important;
+}
+
+html:not(.dark) .text-slate-500 {
+  color: #64748b !important;
+}
+
+html:not(.dark) .bg-slate-950 {
+  background-color: #f8fafc !important;
+}
+
+html:not(.dark) .bg-slate-900 {
+  background-color: #f1f5f9 !important;
+}
+
+html:not(.dark) .bg-slate-900\/50,
+html:not(.dark) .bg-slate-900\/60,
+html:not(.dark) .bg-slate-900\/70,
+html:not(.dark) .bg-slate-900\/80,
+html:not(.dark) .bg-slate-900\/90 {
+  background-color: rgba(241, 245, 249, 0.92) !important;
+}
+
+html:not(.dark) .border-slate-800,
+html:not(.dark) .border-slate-800\/60,
+html:not(.dark) .border-slate-800\/80 {
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .border-slate-700 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Tables in Light Mode */
+html:not(.dark) table {
+  color: #0f172a !important;
+}
+
+html:not(.dark) th {
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+  background-color: #f8fafc !important;
+}
+
+html:not(.dark) td {
+  border-color: #f1f5f9 !important;
+}
+
+html:not(.dark) tr:hover {
+  background-color: #f8fafc !important;
+}
+
+/* Badges with Dark Backgrounds */
+html:not(.dark) .bg-emerald-950\/40,
+html:not(.dark) .bg-emerald-950\/50,
+html:not(.dark) .bg-emerald-950\/60 {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #065f46 !important;
+}
+
+html:not(.dark) .bg-rose-950\/40,
+html:not(.dark) .bg-rose-950\/50,
+html:not(.dark) .bg-rose-950\/60 {
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #9f1239 !important;
+}
+
+html:not(.dark) .bg-amber-950\/40,
+html:not(.dark) .bg-amber-950\/50,
+html:not(.dark) .bg-amber-950\/60 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #92400e !important;
+}
+
+html:not(.dark) .bg-purple-950\/40,
+html:not(.dark) .bg-purple-950\/50,
+html:not(.dark) .bg-purple-950\/60 {
+  background-color: #faf5ff !important;
+  border-color: #e9d5ff !important;
+  color: #6b21a8 !important;
+}
+
+/* Admin Sidebar In Light Mode */
+html:not(.dark) .admin-sidebar-btn:not(.bg-brand-500) {
+  color: #334155 !important;
+}
+
+html:not(.dark) .admin-sidebar-btn:not(.bg-brand-500):hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .admin-drawer-btn:not(.bg-brand-500) {
+  color: #334155 !important;
+}
+
+html:not(.dark) .admin-drawer-btn:not(.bg-brand-500):hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Terminal Log Window (High contrast dark terminal in all modes) */
+#terminalLogWindow, .terminal-window {
+  background-color: #090d16 !important;
+  border-color: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+
+#terminalLogWindow * {
+  color: inherit;
+}
+
+/* Pulsing Badge Indicator */
+.badge-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+/* Ensure solid-colored action buttons retain white text in light mode */
+html:not(.dark) .btn-matrix-start,
+html:not(.dark) .btn-matrix-start *,
+html:not(.dark) .btn-matrix-stop,
+html:not(.dark) .btn-matrix-stop *,
+html:not(.dark) .btn-matrix-restart,
+html:not(.dark) .btn-matrix-restart *,
+html:not(.dark) button.bg-emerald-600,
+html:not(.dark) button.bg-emerald-600 *,
+html:not(.dark) button.bg-rose-600,
+html:not(.dark) button.bg-rose-600 *,
+html:not(.dark) button.bg-blue-600,
+html:not(.dark) button.bg-blue-600 *,
+html:not(.dark) button.bg-brand-500,
+html:not(.dark) button.bg-brand-500 *,
+html:not(.dark) a.bg-brand-500,
+html:not(.dark) a.bg-brand-500 *,
+html:not(.dark) button.bg-brand-600,
+html:not(.dark) button.bg-brand-600 *,
+html:not(.dark) a.bg-sky-500,
+html:not(.dark) a.bg-sky-500 * {
+  color: #ffffff !important;
+}
+
+/* ==============================================================================
+ * Matrix Cyber Hero Card & Telemetry HUD Engine
+ * ============================================================================== */
+.matrix-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.dark .matrix-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(3, 7, 18, 0.98) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 25px -5px rgba(6, 182, 212, 0.12);
+}
+
+html:not(.dark) .matrix-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 0 15px -3px rgba(6, 182, 212, 0.08);
+}
+
+/* Matrix Top Neon Accent Ribbon */
+.matrix-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: linear-gradient(90deg, #06b6d4, #10b981, #8b5cf6, #06b6d4);
+  background-size: 200% 100%;
+  animation: matrixGlow 8s linear infinite;
+  opacity: 0.9;
+  z-index: 10;
+}
+
+@keyframes matrixGlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Micro HUD Items */
+.matrix-hud-item {
+  border-radius: 0.875rem;
+  padding: 0.75rem 0.875rem;
+  transition: all 0.2s ease;
+}
+
+html.dark .matrix-hud-item {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html.dark .matrix-hud-item:hover {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+html:not(.dark) .matrix-hud-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+html:not(.dark) .matrix-hud-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Tactile Matrix Action Buttons */
+.btn-matrix-start {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.btn-matrix-start:hover:not(:disabled) {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+  box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+.btn-matrix-start:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-matrix-stop {
+  background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px 0 rgba(244, 63, 94, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.btn-matrix-stop:hover:not(:disabled) {
+  background: linear-gradient(135deg, #be123c 0%, #e11d48 100%);
+  box-shadow: 0 6px 20px 0 rgba(244, 63, 94, 0.45);
+  transform: translateY(-1px);
+}
+.btn-matrix-stop:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-matrix-restart {
+  background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px 0 rgba(14, 165, 233, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.btn-matrix-restart:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+  box-shadow: 0 6px 20px 0 rgba(14, 165, 233, 0.45);
+  transform: translateY(-1px);
+}
+.btn-matrix-restart:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Radar Pulse Core Container */
+.matrix-core-radar {
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+html.dark .matrix-core-radar.state-running {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+html.dark .matrix-core-radar.state-stopped {
+  background: rgba(100, 116, 139, 0.15);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  color: #94a3b8;
+}
+
+html.dark .matrix-core-radar.state-error {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: #fb7185;
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.3);
+}
+
+html:not(.dark) .matrix-core-radar.state-running {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #059669;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
+}
+
+html:not(.dark) .matrix-core-radar.state-stopped {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+}
+
+html:not(.dark) .matrix-core-radar.state-error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
+  box-shadow: 0 2px 10px rgba(244, 63, 94, 0.2);
+}

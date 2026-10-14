@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Admin CRM Portal • TeleMirror</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#ecfeff', 100: '#cffafe', 400: '#22d3ee', 500: '#06b6d4', 600: '#0891b2', 700: '#0e7490' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="/static/css/theme.css">
+</head>
+<body class="aceternity-bg text-slate-100 flex flex-col min-h-screen">
+
+  <!-- Top Mobile App Header -->
+  <header class="app-header">
+    <div class="admin-header-inner">
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-500 to-cyan-400 flex items-center justify-center text-white font-black shadow-md shadow-brand-500/25">
+          <i class="fa-brands fa-telegram text-base"></i>
+        </div>
+        <div class="flex items-center">
+          <span class="text-sm font-extrabold tracking-tight">TeleMirror</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-300 font-extrabold ml-1.5 border border-purple-500/30">Admin CRM</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Light/Dark Theme" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-amber-400 flex items-center justify-center text-xs transition active:scale-95 shadow-xs">
+          <i class="fa-solid fa-sun" id="themeToggleIcon"></i>
+        </button>
+
+        <a href="/dashboard" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 hover:text-brand-500 font-semibold flex items-center gap-1.5 transition">
+          <i class="fa-brands fa-telegram text-brand-500"></i> <span class="hidden sm:inline">User Dashboard</span>
+        </a>
+
+        <button onclick="toggleAdminDrawer()" title="CRM Navigation" class="md:hidden w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 flex items-center justify-center text-xs transition active:scale-95">
+          <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container: Sidebar + 11 Modules -->
+  <div class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 pb-24 flex flex-col md:flex-row gap-6 items-start">
+    
+    <!-- Desktop Sidebar -->
+    <aside class="hidden md:flex flex-col w-64 glass-card rounded-2xl p-3 border-slate-800 space-y-1 shrink-0 sticky top-20">
+      <div class="px-3 py-2 border-b border-slate-200 dark:border-slate-800 mb-2 flex items-center justify-between">
+        <span class="text-xs font-extrabold uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-grid-2"></i> CRM Modules
+        </span>
+        <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 font-bold">11</span>
+      </div>
+
+      <button onclick="switchAdminTab('crmAnalytics')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold bg-brand-500 text-white flex items-center gap-2.5 transition shadow-sm" data-admin="crmAnalytics">
+        <i class="fa-solid fa-chart-line w-4 text-center"></i> Dashboard Overview
+      </button>
+      <button onclick="switchAdminTab('crmUsers')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5 transition" data-admin="crmUsers">
+        <i class="fa-solid fa-users w-4 text-center"></i> Manage Users
+      </button>
+      <button onclick="switchAdminTab('crmPlans')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5 transition" data-admin="crmPlans">
+        <i class="fa-solid fa-tags w-4 text-center"></i> Subscription Plans
+      </button>
+      <button onclick="switchAdminTab('crmPaymentMethods')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5 transition" data-admin="crmPaymentMethods">
+        <i class="fa-solid fa-wallet w-4 text-center"></i> Payment Gateways
+      </button>
+      <button onclick="switchAdminTab('crmSubsHistory')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center justify-between transition" data-admin="crmSubsHistory">
+        <div class="flex items-center gap-2.5">
+          <i class="fa-solid fa-clock-rotate-left w-4 text-center"></i> Subscriptions
+        </div>
+        <span id="crmPendingBadge" class="hidden text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-black font-extrabold">0</span>
+      </button>
+      <button onclick="switchAdminTab('crmTxHistory')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5 transition" data-admin="crmTxHistory">
+        <i class="fa-solid fa-receipt w-4 text-center"></i> Transactions
+      </button>
+      <button onclick="switchAdminTab('crmNewsletter')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5 transition" data-admin="crmNewsletter">
+        <i class="fa-solid fa-newspaper w-4 text-center"></i> Newsletter Leads
+      </button>
+      <button onclick="switchAdminTab('crmMessageCenter')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5 transition" data-admin="crmMessageCenter">
+        <i class="fa-solid fa-envelope-open-text w-4 text-center"></i> Message Center
+      </button>
+      <button onclick="switchAdminTab('crmSupport')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5 transition" data-admin="crmSupport">
+        <i class="fa-solid fa-headset w-4 text-center"></i> Support Desk
+      </button>
+      <button onclick="switchAdminTab('crmGiveaways')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5 transition" data-admin="crmGiveaways">
+        <i class="fa-solid fa-gift w-4 text-center"></i> Promo Giveaways
+      </button>
+      <button onclick="switchAdminTab('crmSiteSettings')" class="admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5 transition" data-admin="crmSiteSettings">
+        <i class="fa-solid fa-gear w-4 text-center"></i> Site Settings
+      </button>
+    </aside>
+
+    <!-- Mobile Slide-Over Admin Drawer -->
+    <div id="adminMobileDrawer" class="fixed inset-0 z-50 hidden md:hidden">
+      <div onclick="toggleAdminDrawer()" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"></div>
+      <div class="absolute top-0 left-0 bottom-0 w-72 max-w-[85vw] glass-card bg-white dark:bg-slate-950 p-4 border-r border-slate-200 dark:border-purple-500/30 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 overflow-y-auto">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved"></i> Admin CRM
+            </span>
+            <button onclick="toggleAdminDrawer()" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 flex items-center justify-center">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="space-y-1 text-xs font-semibold">
+            <button onclick="switchAdminTab('crmAnalytics'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 bg-brand-500 text-white font-bold" data-admin="crmAnalytics">
+              <i class="fa-solid fa-chart-line w-4 text-center"></i> Overview
+            </button>
+            <button onclick="switchAdminTab('crmUsers'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmUsers">
+              <i class="fa-solid fa-users w-4 text-center"></i> Users
+            </button>
+            <button onclick="switchAdminTab('crmPlans'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmPlans">
+              <i class="fa-solid fa-tags w-4 text-center"></i> Plans
+            </button>
+            <button onclick="switchAdminTab('crmPaymentMethods'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmPaymentMethods">
+              <i class="fa-solid fa-wallet w-4 text-center"></i> Gateways
+            </button>
+            <button onclick="switchAdminTab('crmSubsHistory'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmSubsHistory">
+              <i class="fa-solid fa-clock-rotate-left w-4 text-center"></i> Subscriptions
+            </button>
+            <button onclick="switchAdminTab('crmTxHistory'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmTxHistory">
+              <i class="fa-solid fa-receipt w-4 text-center"></i> Transactions
+            </button>
+            <button onclick="switchAdminTab('crmNewsletter'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmNewsletter">
+              <i class="fa-solid fa-newspaper w-4 text-center"></i> Newsletter
+            </button>
+            <button onclick="switchAdminTab('crmMessageCenter'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmMessageCenter">
+              <i class="fa-solid fa-envelope-open-text w-4 text-center"></i> Message Center
+            </button>
+            <button onclick="switchAdminTab('crmSupport'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmSupport">
+              <i class="fa-solid fa-headset w-4 text-center"></i> Support Desk
+            </button>
+            <button onclick="switchAdminTab('crmGiveaways'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmGiveaways">
+              <i class="fa-solid fa-gift w-4 text-center"></i> Giveaways
+            </button>
+            <button onclick="switchAdminTab('crmSiteSettings'); toggleAdminDrawer()" class="admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900" data-admin="crmSiteSettings">
+              <i class="fa-solid fa-gear w-4 text-center"></i> Site Settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Admin Viewport (11 Modules Content) -->
+    <section class="flex-1 w-full min-w-0 space-y-5">
+      
+      <!-- =====================================================================
+           Module 1: Overview Analytics
+           ===================================================================== -->
+      <div id="crmAnalytics" class="admin-tab-view space-y-5">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800">
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Total Users</div>
+            <div id="crmTotalUsers" class="text-2xl font-black text-slate-900 dark:text-white mt-1">0</div>
+          </div>
+          <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800">
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Active Subscriptions</div>
+            <div id="crmActiveSubs" class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">0</div>
+          </div>
+          <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800">
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Platform Revenue</div>
+            <div id="crmTotalRev" class="text-2xl font-black text-brand-600 dark:text-brand-400 mt-1">₦0</div>
+          </div>
+          <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800">
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Pending Approvals</div>
+            <div id="crmPendingApprovals" class="text-2xl font-black text-amber-500 dark:text-amber-400 mt-1">0</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="glass-card rounded-2xl p-3.5 border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Running Bots</div>
+              <div id="crmRunningBots" class="text-lg font-bold text-slate-900 dark:text-white">0</div>
+            </div>
+            <i class="fa-solid fa-robot text-brand-500 text-lg opacity-80"></i>
+          </div>
+          <div class="glass-card rounded-2xl p-3.5 border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Open Support Tickets</div>
+              <div id="crmOpenTickets" class="text-lg font-bold text-rose-500">0</div>
+            </div>
+            <i class="fa-solid fa-headset text-rose-500 text-lg opacity-80"></i>
+          </div>
+          <div class="glass-card rounded-2xl p-3.5 border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Total Subscriptions</div>
+              <div id="crmTotalSubs" class="text-lg font-bold text-slate-900 dark:text-white">0</div>
+            </div>
+            <i class="fa-solid fa-tags text-purple-500 text-lg opacity-80"></i>
+          </div>
+          <div class="glass-card rounded-2xl p-3.5 border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Active User Ratio</div>
+              <div id="crmActiveUserRatio" class="text-lg font-bold text-emerald-500">0%</div>
+            </div>
+            <i class="fa-solid fa-user-check text-emerald-500 text-lg opacity-80"></i>
+          </div>
+        </div>
+
+        <!-- Pending Manual Bank Payments Card -->
+        <div class="glass-card rounded-2xl p-5 border-slate-200 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-amber-500"></i> Pending Bank Approvals Awaiting Verification
+            </h3>
+            <span class="text-[11px] text-slate-500 dark:text-slate-400">Manual payment submissions</span>
+          </div>
+          <div id="crmPendingList" class="space-y-2.5 text-xs">
+            <div class="text-slate-500 py-3 text-center">No pending manual payments at this time.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           Module 2: Manage Users
+           ===================================================================== -->
+      <div id="crmUsers" class="admin-tab-view hidden space-y-4">
+        <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="relative w-full max-w-md">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="crmUserSearch" oninput="loadAdminUsers()" placeholder="Search users by name or email..." class="glass-input pl-9 pr-3.5 py-2 rounded-xl text-xs w-full">
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button onclick="loadAdminUsers()" class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-arrows-rotate"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl border-slate-200 dark:border-slate-800 overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-wider">
+              <tr>
+                <th class="p-3">User & Contact</th>
+                <th class="p-3">Role</th>
+                <th class="p-3">Status</th>
+                <th class="p-3">Plan / Tier</th>
+                <th class="p-3">Bot Engine</th>
+                <th class="p-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="crmUsersTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           Module 3: Subscription Plans
+           ===================================================================== -->
+      <div id="crmPlans" class="admin-tab-view hidden space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Subscription Plans & App Limits</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Configure tiers, channel copying limits (1 to 9999), and interactive function permissions.</p>
+          </div>
+          <button onclick="openPlanModal()" class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-plus"></i> Add New Plan
+          </button>
+        </div>
+
+        <div id="crmPlansList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+      <!-- =====================================================================
+           Module 4: Payment Gateways
+           ===================================================================== -->
+      <div id="crmPaymentMethods" class="admin-tab-view hidden space-y-4">
+        <form onsubmit="handleSavePaymentKeys(event)" class="glass-card rounded-2xl p-5 border-slate-200 dark:border-slate-800 space-y-5 text-xs">
+          <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Payment Gateways & API Credentials</h3>
+              <p class="text-slate-500 dark:text-slate-400 text-[11px]">Toggle automatic processors (Paystack, Korapay, OPay, PalmPay) and update bank transfer info.</p>
+            </div>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> Save Changes
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Paystack -->
+            <div class="space-y-2.5 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 font-bold text-slate-900 dark:text-white cursor-pointer">
+                  <input type="checkbox" id="admPaystackEnabled" class="w-4 h-4 rounded text-brand-500"> Paystack Gateway
+                </label>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold">NGN / Cards / USSD</span>
+              </div>
+              <input type="text" id="admPaystackPub" placeholder="Paystack Public Key (pk_live_... or pk_test_...)" class="glass-input w-full p-2.5 rounded-xl font-mono text-xs">
+              <input type="password" id="admPaystackSec" placeholder="Paystack Secret Key (sk_live_... or sk_test_...)" class="glass-input w-full p-2.5 rounded-xl font-mono text-xs">
+            </div>
+
+            <!-- Korapay -->
+            <div class="space-y-2.5 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 font-bold text-slate-900 dark:text-white cursor-pointer">
+                  <input type="checkbox" id="admKorapayEnabled" class="w-4 h-4 rounded text-brand-500"> Korapay Gateway
+                </label>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold">Mobile Money / Cards</span>
+              </div>
+              <input type="text" id="admKorapayPub" placeholder="Korapay Public Key (pk_...)" class="glass-input w-full p-2.5 rounded-xl font-mono text-xs">
+              <input type="password" id="admKorapaySec" placeholder="Korapay Secret Key (sk_...)" class="glass-input w-full p-2.5 rounded-xl font-mono text-xs">
+            </div>
+
+            <!-- OPay Instant Wallet -->
+            <div class="space-y-2.5 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 font-bold text-slate-900 dark:text-white cursor-pointer">
+                  <input type="checkbox" id="admOpayEnabled" class="w-4 h-4 rounded text-brand-500"> OPay Instant Checkout
+                </label>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold">OPay Wallet & QR</span>
+              </div>
+              <input type="text" id="admOpayMerchant" placeholder="OPay Merchant ID" class="glass-input w-full p-2.5 rounded-xl font-mono text-xs">
+              <input type="password" id="admOpaySec" placeholder="OPay Secret Key / Token" class="glass-input w-full p-2.5 rounded-xl font-mono text-xs">
+            </div>
+
+            <!-- PalmPay -->
+            <div class="space-y-2.5 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 font-bold text-slate-900 dark:text-white cursor-pointer">
+                  <input type="checkbox" id="admPalmpayEnabled" class="w-4 h-4 rounded text-brand-500"> PalmPay Checkout
+                </label>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold">PalmPay Pay</span>
+              </div>
+              <input type="text" id="admPalmpayAppId" placeholder="PalmPay App ID" class="glass-input w-full p-2.5 rounded-xl font-mono text-xs">
+              <input type="password" id="admPalmpaySec" placeholder="PalmPay Secret Key" class="glass-input w-full p-2.5 rounded-xl font-mono text-xs">
+            </div>
+          </div>
+
+          <!-- Manual Bank Transfer -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="flex items-center gap-2 font-bold text-slate-900 dark:text-white cursor-pointer">
+                <input type="checkbox" id="admManualEnabled" class="w-4 h-4 rounded text-brand-500"> Manual Bank Transfer & Offline Payment
+              </label>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400">Users upload transfer proof</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Bank Name / Provider</label>
+                <input type="text" id="admBankName" placeholder="e.g. Zenith Bank / OPay / Crypto" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Account Number / Wallet</label>
+                <input type="text" id="admAccountNum" placeholder="e.g. 1029384756" class="glass-input w-full p-2.5 rounded-xl font-mono">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Account Beneficiary Name</label>
+                <input type="text" id="admAccountName" placeholder="e.g. TeleMirror Enterprise" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 dark:text-slate-400 mb-1">Instructions Shown to User on Checkout</label>
+              <textarea id="admManualInstructions" rows="2" placeholder="Transfer the exact amount to the account above and upload sender name, bank, and reference for instant verification..." class="glass-input w-full p-2.5 rounded-xl"></textarea>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md">
+              <i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Payment Gateway Settings
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- =====================================================================
+           Module 5: Subscriptions History & Approvals
+           ===================================================================== -->
+      <div id="crmSubsHistory" class="admin-tab-view hidden space-y-4">
+        <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
+            <button onclick="filterSubs('all')" class="subs-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-500 text-white" data-filter="all">All</button>
+            <button onclick="filterSubs('pending')" class="subs-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900" data-filter="pending">Pending</button>
+            <button onclick="filterSubs('active')" class="subs-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900" data-filter="active">Active</button>
+            <button onclick="filterSubs('cancelled')" class="subs-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900" data-filter="cancelled">Cancelled</button>
+          </div>
+          <button onclick="openGrantSubModal()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-gift"></i> + Grant Subscription
+          </button>
+        </div>
+
+        <div class="glass-card rounded-2xl border-slate-200 dark:border-slate-800 overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-wider">
+              <tr>
+                <th class="p-3">User</th>
+                <th class="p-3">Plan</th>
+                <th class="p-3">Gateway / Method</th>
+                <th class="p-3">Status</th>
+                <th class="p-3">Start Date</th>
+                <th class="p-3">Expires At</th>
+                <th class="p-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="crmSubsTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           Module 6: Transactions History
+           ===================================================================== -->
+      <div id="crmTxHistory" class="admin-tab-view hidden space-y-4">
+        <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+          <div class="relative w-full max-w-md">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="crmTxSearch" oninput="filterTransactions()" placeholder="Search by reference or user..." class="glass-input pl-9 pr-3.5 py-2 rounded-xl text-xs w-full">
+          </div>
+          <button onclick="loadAdminTransactions()" class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shrink-0">
+            <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh
+          </button>
+        </div>
+
+        <div class="glass-card rounded-2xl border-slate-200 dark:border-slate-800 overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-wider">
+              <tr>
+                <th class="p-3">Reference</th>
+                <th class="p-3">User</th>
+                <th class="p-3">Plan</th>
+                <th class="p-3">Amount</th>
+                <th class="p-3">Gateway</th>
+                <th class="p-3">Status</th>
+                <th class="p-3">Date</th>
+                <th class="p-3 text-right">Receipt</th>
+              </tr>
+            </thead>
+            <tbody id="crmTxTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           Module 7: Newsletter Leads
+           ===================================================================== -->
+      <div id="crmNewsletter" class="admin-tab-view hidden space-y-4">
+        <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Newsletter Marketing Subscribers</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Total subscribed audience: <span id="crmNewsletterCount" class="font-bold text-brand-500">0</span></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openAddNewsletterModal()" class="px-3.5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shrink-0">
+              <i class="fa-solid fa-plus mr-1"></i> Add Subscriber
+            </button>
+            <button onclick="exportNewsletterCSV()" class="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs border border-slate-200 dark:border-slate-700">
+              <i class="fa-solid fa-download mr-1"></i> Export CSV
+            </button>
+            <button onclick="composeNewsletterBroadcast()" class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs">
+              <i class="fa-solid fa-paper-plane mr-1"></i> Send Campaign
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl border-slate-200 dark:border-slate-800 overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-wider">
+              <tr>
+                <th class="p-3">Subscriber Email</th>
+                <th class="p-3">Registered Account?</th>
+                <th class="p-3">Subscribed Date</th>
+                <th class="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="crmNewsletterTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           Module 8: Message Center
+           ===================================================================== -->
+      <div id="crmMessageCenter" class="admin-tab-view hidden space-y-4">
+        <div class="glass-card rounded-2xl p-5 border-slate-200 dark:border-slate-800 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane text-brand-500"></i> Dispatch Branded Broadcast
+              </h3>
+              <p class="text-slate-500 dark:text-slate-400 text-[11px]">Send announcements, maintenance alerts, or upgrade promos directly to user notifications & inbox.</p>
+            </div>
+            <div class="w-48">
+              <select onchange="applyMessageTemplate(this.value)" class="glass-input w-full p-2 rounded-xl text-xs">
+                <option value="">Quick Templates...</option>
+                <option value="maintenance">Maintenance Notice</option>
+                <option value="promo">20% Upgrade Promo</option>
+                <option value="features">New Features Release</option>
+                <option value="welcome">Welcome to TeleMirror Pro</option>
+              </select>
+            </div>
+          </div>
+
+          <form onsubmit="handleSendBroadcast(event)" class="space-y-3.5 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Target Audience</label>
+                <select id="msgRecipientType" onchange="toggleRecipientIdInput()" class="glass-input w-full p-2.5 rounded-xl">
+                  <option value="all">Broadcast to All Active Users</option>
+                  <option value="newsletter">All Newsletter Leads</option>
+                  <option value="single">Single User (Specify User ID)</option>
+                </select>
+              </div>
+              <div id="msgRecipientIdGroup" class="hidden">
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">User ID</label>
+                <input type="number" id="msgRecipientId" placeholder="Enter User ID (e.g. 5)" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Subject / Notification Title</label>
+              <input type="text" id="msgSubject" required placeholder="e.g. Scheduled System Upgrade Tonight • TeleMirror Pro" class="glass-input w-full p-2.5 rounded-xl">
+            </div>
+
+            <div>
+              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Message Body</label>
+              <textarea id="msgBody" rows="5" required placeholder="Write your branded message or announcement..." class="glass-input w-full p-2.5 rounded-xl font-sans"></textarea>
+            </div>
+
+            <div class="flex justify-end">
+              <button type="submit" class="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5">
+                <i class="fa-solid fa-paper-plane"></i> Dispatch Broadcast
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Broadcast Logs -->
+        <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800 space-y-3">
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Past Dispatched Broadcasts</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 text-[11px] uppercase">
+                <tr>
+                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Subject</th>
+                  <th class="p-2.5">Audience</th>
+                  <th class="p-2.5">Recipients</th>
+                  <th class="p-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody id="crmMessageLogsBody" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           Module 9: Support Desk & Real-Time Chat
+           ===================================================================== -->
+      <div id="crmSupport" class="admin-tab-view hidden space-y-4">
+        <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
+            <button onclick="filterTickets('all')" class="ticket-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-500 text-white" data-filter="all">All</button>
+            <button onclick="filterTickets('open')" class="ticket-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900" data-filter="open">Open</button>
+            <button onclick="filterTickets('in-progress')" class="ticket-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900" data-filter="in-progress">In Progress</button>
+            <button onclick="filterTickets('resolved')" class="ticket-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900" data-filter="resolved">Resolved</button>
+          </div>
+          <button onclick="loadAdminTickets()" class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shrink-0">
+            <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh Tickets
+          </button>
+        </div>
+
+        <div id="crmTicketsList" class="space-y-3"></div>
+      </div>
+
+      <!-- =====================================================================
+           Module 10: Giveaways & Promo Passes
+           ===================================================================== -->
+      <div id="crmGiveaways" class="admin-tab-view hidden space-y-4">
+        <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Giveaway Campaigns & Promotional Passes</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Issue claimable promo coupon codes for free tier access.</p>
+          </div>
+          <button onclick="openCreateGiveawayModal()" class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-plus"></i> Create Giveaway
+          </button>
+        </div>
+
+        <div id="crmGiveawaysList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+
+      <!-- =====================================================================
+           Module 11: Site Settings & System Logs
+           ===================================================================== -->
+      <div id="crmSiteSettings" class="admin-tab-view hidden space-y-6">
+        <form onsubmit="handleSaveSiteSettings(event)" class="glass-card rounded-2xl p-5 border-slate-200 dark:border-slate-800 space-y-4 text-xs">
+          <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Platform Settings & Configurations</h3>
+              <p class="text-slate-500 dark:text-slate-400 text-[11px]">Control site name, SEO metadata, registration gates, and SMTP email service.</p>
+            </div>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> Save All Settings
+            </button>
+          </div>
+
+          <!-- General -->
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 mb-2.5">General Information</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Site Brand Name</label>
+                <input type="text" id="setSiteName" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Telegram Support Channel Link</label>
+                <input type="text" id="setTgSupport" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Support Contact Email</label>
+                <input type="email" id="setSupportEmail" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Admin Notification Phone</label>
+                <input type="text" id="setAdminPhone" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+            </div>
+          </div>
+
+          <!-- Security & Mode -->
+          <div class="border-t border-slate-200 dark:border-slate-800 pt-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 mb-2.5">Security & Access Control</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Maintenance Mode</label>
+                <select id="setMaintenance" class="glass-input w-full p-2.5 rounded-xl">
+                  <option value="0">Normal Operation (Live for all users)</option>
+                  <option value="1">Maintenance Mode (Only Admin can access)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">User Registrations</label>
+                <select id="setAllowRegistration" class="glass-input w-full p-2.5 rounded-xl">
+                  <option value="1">Open (Anyone can register an account)</option>
+                  <option value="0">Invite / Closed (Registrations disabled)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEO -->
+          <div class="border-t border-slate-200 dark:border-slate-800 pt-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 mb-2.5">SEO & Social Meta</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Meta Title</label>
+                <input type="text" id="setSeoTitle" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Meta Keywords</label>
+                <input type="text" id="setSeoKeywords" placeholder="telegram mirror, telegram forwarder, bot cloner" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Meta Description</label>
+                <input type="text" id="setSeoDesc" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+            </div>
+          </div>
+
+          <!-- SMTP -->
+          <div class="border-t border-slate-200 dark:border-slate-800 pt-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 mb-2.5">SMTP Email Configuration</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">SMTP Host</label>
+                <input type="text" id="setSmtpHost" placeholder="smtp.gmail.com" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">SMTP Port</label>
+                <input type="number" id="setSmtpPort" placeholder="587" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">SMTP User / From Email</label>
+                <input type="text" id="setSmtpUser" placeholder="support@telemirror.com" class="glass-input w-full p-2.5 rounded-xl">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md">
+              <i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Site Settings
+            </button>
+          </div>
+        </form>
+
+        <!-- System Audit & Error Logs Viewer -->
+        <div class="glass-card rounded-2xl p-5 border-slate-200 dark:border-slate-800 space-y-4 text-xs">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-terminal text-purple-500"></i> Platform Audit & Error Logs
+              </h3>
+              <p class="text-slate-500 dark:text-slate-400 text-[11px]">Real-time system events, administrator actions, and audit records.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="loadAdminLogs()" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs border border-slate-200 dark:border-slate-700">
+                <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh Logs
+              </button>
+              <button onclick="clearAuditLogs()" class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs">
+                <i class="fa-solid fa-trash-can mr-1"></i> Clear Logs
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto max-h-80 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 text-[11px] sticky top-0">
+                <tr>
+                  <th class="p-2.5">Timestamp</th>
+                  <th class="p-2.5">User</th>
+                  <th class="p-2.5">Action</th>
+                  <th class="p-2.5">Details</th>
+                </tr>
+              </thead>
+              <tbody id="crmLogsBody" class="divide-y divide-slate-200 dark:divide-slate-800/60 font-mono text-[11px]"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- 1. Edit User Modal -->
+  <div id="editUserModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 w-full max-w-lg shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-pen text-brand-500"></i> Edit User Account
+        </h3>
+        <button onclick="closeModal('editUserModal')" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveEditUser(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="editUserId">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
+            <input type="text" id="editUserName" required class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+            <input type="email" id="editUserEmail" required class="glass-input w-full p-2.5 rounded-xl">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Role</label>
+            <select id="editUserRole" class="glass-input w-full p-2.5 rounded-xl font-bold">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Status</label>
+            <select id="editUserActive" class="glass-input w-full p-2.5 rounded-xl">
+              <option value="1">Active</option>
+              <option value="0">Disabled</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Verified</label>
+            <select id="editUserVerified" class="glass-input w-full p-2.5 rounded-xl">
+              <option value="1">Verified</option>
+              <option value="0">Unverified</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Assign / Change Subscription Plan</label>
+          <select id="editUserPlanId" class="glass-input w-full p-2.5 rounded-xl font-semibold text-brand-600 dark:text-brand-400">
+            <option value="0">-- Keep Current Subscription --</option>
+          </select>
+          <p class="text-[11px] text-slate-500 mt-1">Assigning a new plan creates an active manual subscription and sets channel limits immediately.</p>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Reset Password (Optional)</label>
+          <input type="password" id="editUserPassword" placeholder="Leave empty to retain existing password" class="glass-input w-full p-2.5 rounded-xl">
+        </div>
+
+        <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+          <div class="text-[11px] text-slate-600 dark:text-slate-400">
+            <strong>Inspect User Dashboard</strong>
+            <div>Log in as this user to test and view their channels and rules.</div>
+          </div>
+          <button type="button" onclick="impersonateCurrentUserModal()" class="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold text-xs hover:bg-amber-500/30">
+            <i class="fa-solid fa-user-secret mr-1"></i> Login as User
+          </button>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" onclick="closeModal('editUserModal')" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold shadow-md">
+            Save User Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Plan Editor Modal (Add New Plan or Edit Plan) -->
+  <div id="planModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 w-full max-w-xl shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 id="planModalTitle" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-tags text-brand-500"></i> Configure Subscription Plan
+        </h3>
+        <button onclick="closeModal('planModal')" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSavePlan(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="planId">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Plan Display Name</label>
+            <input type="text" id="planName" required placeholder="e.g. Pro Trader" class="glass-input w-full p-2.5 rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Slug Identifier</label>
+            <input type="text" id="planSlug" placeholder="e.g. pro-trader" class="glass-input w-full p-2.5 rounded-xl font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Description / Tagline</label>
+          <input type="text" id="planDesc" placeholder="e.g. For professional signal traders & multi-channel forwarding" class="glass-input w-full p-2.5 rounded-xl">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Price (NGN / USD)</label>
+            <input type="number" step="any" id="planPrice" required placeholder="25000" class="glass-input w-full p-2.5 rounded-xl font-bold text-emerald-600 dark:text-emerald-400">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Currency</label>
+            <select id="planCurrency" class="glass-input w-full p-2.5 rounded-xl">
+              <option value="NGN">NGN (₦)</option>
+              <option value="USD">USD ($)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Duration (Days)</label>
+            <input type="number" id="planDuration" required value="30" class="glass-input w-full p-2.5 rounded-xl font-bold">
+          </div>
+        </div>
+
+        <!-- Channel Limit Configuration (1 to 9999) -->
+        <div class="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/30 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="font-extrabold text-purple-700 dark:text-purple-300 uppercase tracking-wider text-[11px]">
+                <i class="fa-solid fa-arrow-down-up-lock mr-1"></i> Max Source Channel Mirroring Limit
+              </span>
+              <p class="text-[11px] text-slate-600 dark:text-slate-400">Whatever limit you set here is strictly enforced on users subscribed to this plan.</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="number" id="planChannelLimit" min="1" max="9999" required value="3" class="glass-input w-24 p-2 rounded-xl text-center font-black text-sm text-purple-600 dark:text-purple-300 border-purple-500/40">
+            </div>
+          </div>
+          <!-- Preset Limit Buttons -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-1">
+            <span class="text-[10px] text-slate-500 font-semibold">Quick Presets:</span>
+            <button type="button" onclick="setPlanChannelLimit(1)" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] border border-slate-200 dark:border-slate-700 hover:bg-purple-600 hover:text-white">1 Channel</button>
+            <button type="button" onclick="setPlanChannelLimit(3)" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] border border-slate-200 dark:border-slate-700 hover:bg-purple-600 hover:text-white">3 Channels</button>
+            <button type="button" onclick="setPlanChannelLimit(5)" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] border border-slate-200 dark:border-slate-700 hover:bg-purple-600 hover:text-white">5 Channels</button>
+            <button type="button" onclick="setPlanChannelLimit(10)" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] border border-slate-200 dark:border-slate-700 hover:bg-purple-600 hover:text-white">10 Channels</button>
+            <button type="button" onclick="setPlanChannelLimit(25)" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] border border-slate-200 dark:border-slate-700 hover:bg-purple-600 hover:text-white">25 Channels</button>
+            <button type="button" onclick="setPlanChannelLimit(9999)" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold text-[10px] shadow-xs">9999 (Unlimited)</button>
+          </div>
+        </div>
+
+        <!-- Interactive App Functions & Feature Matrix -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-slate-900 dark:text-white text-xs">App Functions & Feature Matrix Checkbox Listing:</label>
+            <span class="text-[10px] text-slate-500">Check features enabled for this tier</span>
+          </div>
+          
+          <div id="planFeaturesMatrix" class="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 max-h-48 overflow-y-auto">
+            <!-- Feature Checkboxes dynamically or statically prefilled -->
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <input type="text" id="customFeatureInput" placeholder="Add custom feature (e.g. VIP Signal Customizer)..." class="glass-input flex-1 p-2 rounded-xl text-xs">
+            <button type="button" onclick="addCustomPlanFeature()" class="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs shrink-0 hover:bg-brand-500 hover:text-white">
+              + Add
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <label class="flex items-center gap-2 font-bold text-slate-900 dark:text-white cursor-pointer">
+            <input type="checkbox" id="planIsActive" checked class="w-4 h-4 rounded text-brand-500">
+            Publish on Pricing & Checkout Page
+          </label>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" onclick="closeModal('planModal')" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold shadow-md">
+            Save Plan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Grant Subscription Modal -->
+  <div id="grantSubModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-gift text-emerald-500"></i> Grant Manual Subscription
+        </h3>
+        <button onclick="closeModal('grantSubModal')" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleGrantSubscription(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Select User</label>
+          <select id="grantUserId" required class="glass-input w-full p-2.5 rounded-xl"></select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Select Plan to Grant</label>
+          <select id="grantPlanId" required class="glass-input w-full p-2.5 rounded-xl font-bold text-brand-600 dark:text-brand-400"></select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Duration in Days</label>
+          <input type="number" id="grantDurationDays" value="30" required class="glass-input w-full p-2.5 rounded-xl font-bold">
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" onclick="closeModal('grantSubModal')" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md">
+            Grant Active Subscription
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. View Proof Modal -->
+  <div id="viewProofModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-receipt text-amber-500"></i> Payment Proof & Verification
+        </h3>
+        <button onclick="closeModal('viewProofModal')" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="proofModalContent" class="space-y-3 text-xs"></div>
+
+      <div id="proofModalActions" class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800"></div>
+    </div>
+  </div>
+
+  <!-- 5. Support Ticket Chat Modal -->
+  <div id="adminTicketChatModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 w-full max-w-2xl shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 shrink-0">
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="chatTicketSubject" class="text-sm font-bold text-slate-900 dark:text-white">Ticket</span>
+            <span id="chatTicketStatusBadge" class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase"></span>
+          </div>
+          <div id="chatTicketUser" class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5"></div>
+        </div>
+        <button onclick="closeModal('adminTicketChatModal')" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Chat Messages Scroll View -->
+      <div id="adminTicketMessages" class="flex-1 overflow-y-auto space-y-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs min-h-[240px] max-h-[380px]"></div>
+
+      <!-- Admin Reply Box -->
+      <form onsubmit="sendAdminTicketReply(event)" class="shrink-0 space-y-2.5 pt-2 border-t border-slate-200 dark:border-slate-800 text-xs">
+        <input type="hidden" id="chatTicketId">
+        <div class="flex items-center justify-between gap-2">
+          <label class="font-semibold text-slate-700 dark:text-slate-300">Reply to User & Update Status:</label>
+          <select id="chatTicketStatusSelect" class="glass-input p-1.5 rounded-lg text-xs font-bold">
+            <option value="in_progress">Mark as In-Progress</option>
+            <option value="resolved">Mark as Resolved</option>
+            <option value="open">Keep Open</option>
+            <option value="closed">Close Ticket</option>
+          </select>
+        </div>
+        <div class="flex gap-2">
+          <textarea id="chatReplyInput" required rows="2" placeholder="Type your support reply to the user..." class="glass-input flex-1 p-2.5 rounded-xl"></textarea>
+          <button type="submit" class="px-5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-paper-plane"></i> Send
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Create Giveaway Modal -->
+  <div id="createGiveawayModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-gift text-purple-500"></i> Create Promo Giveaway Pass
+        </h3>
+        <button onclick="closeModal('createGiveawayModal')" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleCreateGiveaway(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Promo Code</label>
+          <input type="text" id="giveawayCode" required placeholder="e.g. VIPLAUNCH30" class="glass-input w-full p-2.5 rounded-xl uppercase font-mono font-bold tracking-wider">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Campaign Title</label>
+          <input type="text" id="giveawayTitle" required placeholder="e.g. Launch Day Free Trial" class="glass-input w-full p-2.5 rounded-xl font-bold">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Plan to Grant</label>
+            <select id="giveawayPlanId" required class="glass-input w-full p-2.5 rounded-xl font-bold text-brand-600 dark:text-brand-400"></select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Duration (Days)</label>
+            <input type="number" id="giveawayDuration" value="7" required class="glass-input w-full p-2.5 rounded-xl font-bold">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Target Audience</label>
+            <select id="giveawayTarget" class="glass-input w-full p-2.5 rounded-xl">
+              <option value="all">All Users</option>
+              <option value="new_only">New Users Only</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Max Claims (0 = Unltd)</label>
+            <input type="number" id="giveawayMaxClaims" value="50" required class="glass-input w-full p-2.5 rounded-xl font-mono">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" onclick="closeModal('createGiveawayModal')" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold shadow-md">
+            Create Giveaway
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Add Newsletter Subscriber Modal -->
+  <div id="addNewsletterModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 w-full max-w-sm shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-envelope text-brand-500"></i> Add Subscriber
+        </h3>
+        <button onclick="closeModal('addNewsletterModal')" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleAddNewsletter(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+          <input type="email" id="newSubscriberEmail" required placeholder="name@domain.com" class="glass-input w-full p-2.5 rounded-xl">
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" onclick="closeModal('addNewsletterModal')" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold shadow-md">
+            Add Subscriber
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. Transaction Details Modal -->
+  <div id="txDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="glass-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 w-full max-w-md shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-receipt text-brand-500"></i> Transaction Details
+        </h3>
+        <button onclick="closeModal('txDetailModal')" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="txDetailContent" class="space-y-2.5 text-xs"></div>
+
+      <div class="flex justify-end pt-2 border-t border-slate-200 dark:border-slate-800">
+        <button onclick="closeModal('txDetailModal')" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
+
+  <script src="/static/js/app-core.js"></script>
+  <script>
+    // State caches
+    let gAllPlans = [];
+    let gAllUsers = [];
+    let gAllSubs = [];
+    let gAllTx = [];
+
+    // Core Preset Features
+    const DEFAULT_APP_FUNCTIONS = [
+      "Real-time Message Mirroring",
+      "Media & Album Auto-Cloning",
+      "Text Replacer & Customizer",
+      "Link, Username & Watermark Remover",
+      "Custom Header & Footer Injection",
+      "Inline Button Remover & Cleaner",
+      "Delay & Anti-Flood Protection",
+      "Duplicate Message Filter",
+      "24/7 Live Web Terminal Logs",
+      "Dedicated Background Worker",
+      "Priority 24/7 Support Desk",
+      "Unlimited Channel Mirroring"
+    ];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAuthAndSubscription((data) => {
+        if (!data.authenticated || !data.user || data.user.role !== 'admin') {
+          showToast('Unauthorized access. Admin privileges required.', 'error');
+          setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
+          return;
+        }
+      });
+      loadAdminAnalytics();
+      fetchGlobalPlans();
+    });
+
+    function toggleAdminDrawer() {
+      const drawer = document.getElementById('adminMobileDrawer');
+      const content = drawer.querySelector('.transform');
+      if (drawer.classList.contains('hidden')) {
+        drawer.classList.remove('hidden');
+        setTimeout(() => { content.classList.remove('-translate-x-full'); }, 15);
+      } else {
+        content.classList.add('-translate-x-full');
+        setTimeout(() => { drawer.classList.add('hidden'); }, 280);
+      }
+    }
+
+    function closeModal(modalId) {
+      const m = document.getElementById(modalId);
+      if (m) m.classList.add('hidden');
+    }
+
+    function switchAdminTab(tabId) {
+      document.querySelectorAll('.admin-sidebar-btn').forEach(b => {
+        if (b.dataset.admin === tabId) {
+          b.className = 'admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold bg-brand-500 text-white flex items-center gap-2.5 shadow-sm';
+        } else {
+          b.className = 'admin-sidebar-btn w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white flex items-center gap-2.5';
+        }
+      });
+
+      document.querySelectorAll('.admin-drawer-btn').forEach(b => {
+        if (b.dataset.admin === tabId) {
+          b.className = 'admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 bg-brand-500 text-white font-bold';
+        } else {
+          b.className = 'admin-drawer-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 font-semibold';
+        }
+      });
+
+      document.querySelectorAll('.admin-tab-view').forEach(v => v.classList.add('hidden'));
+      const activeTab = document.getElementById(tabId);
+      if (activeTab) activeTab.classList.remove('hidden');
+
+      if (tabId === 'crmAnalytics') loadAdminAnalytics();
+      if (tabId === 'crmUsers') loadAdminUsers();
+      if (tabId === 'crmPlans') loadAdminPlans();
+      if (tabId === 'crmSubsHistory') loadAdminSubscriptions();
+      if (tabId === 'crmTxHistory') loadAdminTransactions();
+      if (tabId === 'crmNewsletter') loadAdminNewsletters();
+      if (tabId === 'crmMessageCenter') loadAdminMessageLogs();
+      if (tabId === 'crmSupport') loadAdminTickets();
+      if (tabId === 'crmGiveaways') loadAdminGiveaways();
+      if (tabId === 'crmSiteSettings') { loadAdminSettings(); loadAdminLogs(); }
+      if (tabId === 'crmPaymentMethods') loadAdminPaymentMethods();
+    }
+
+    async function fetchGlobalPlans() {
+      try {
+        const res = await fetch('/api/admin/plans');
+        const data = await res.json();
+        if (data.success) {
+          gAllPlans = data.plans || [];
+          populatePlanDropdowns();
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function populatePlanDropdowns() {
+      const userPlanSelect = document.getElementById('editUserPlanId');
+      if (userPlanSelect) {
+        userPlanSelect.innerHTML = '<option value="0">-- Retain Existing Plan --</option>' +
+          gAllPlans.map(p => `<option value="${p.id}">${p.name} (Max ${p.channel_limit >= 9999 ? 'Unlimited' : p.channel_limit} channels) - ₦${Number(p.price).toLocaleString()}</option>`).join('');
+      }
+
+      const grantPlanSelect = document.getElementById('grantPlanId');
+      if (grantPlanSelect) {
+        grantPlanSelect.innerHTML = gAllPlans.map(p => `<option value="${p.id}">${p.name} (Max ${p.channel_limit >= 9999 ? 'Unlimited' : p.channel_limit} channels) - ₦${Number(p.price).toLocaleString()}</option>`).join('');
+      }
+
+      const giveawayPlanSelect = document.getElementById('giveawayPlanId');
+      if (giveawayPlanSelect) {
+        giveawayPlanSelect.innerHTML = gAllPlans.map(p => `<option value="${p.id}">${p.name} (${p.duration_days} days)</option>`).join('');
+      }
+    }
+
+    // =========================================================================
+    // 1. Dashboard Overview Analytics
+    // =========================================================================
+    async function loadAdminAnalytics() {
+      try {
+        const res = await fetch('/api/admin/analytics');
+        const data = await res.json();
+        document.getElementById('crmTotalUsers').innerText = data.total_users || 0;
+        document.getElementById('crmActiveSubs').innerText = data.active_subscriptions || 0;
+        document.getElementById('crmTotalRev').innerText = `₦${Number(data.total_revenue || 0).toLocaleString()}`;
+        document.getElementById('crmPendingApprovals').innerText = data.pending_approvals || 0;
+
+        document.getElementById('crmRunningBots').innerText = data.running_bots || 0;
+        document.getElementById('crmOpenTickets').innerText = data.open_tickets || 0;
+        document.getElementById('crmTotalSubs').innerText = data.total_subscriptions || 0;
+        const ratio = data.total_users > 0 ? Math.round(((data.active_users || 0) / data.total_users) * 100) : 0;
+        document.getElementById('crmActiveUserRatio').innerText = `${ratio}%`;
+
+        const badge = document.getElementById('crmPendingBadge');
+        if (data.pending_approvals > 0) {
+          badge.innerText = data.pending_approvals;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+
+        const list = document.getElementById('crmPendingList');
+        if (data.pending_approval_list && data.pending_approval_list.length) {
+          list.innerHTML = data.pending_approval_list.map(s => `
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border border-amber-500/30">
+              <div>
+                <div class="flex items-center gap-2">
+                  <strong class="text-slate-900 dark:text-white">${s.user_name}</strong>
+                  <span class="text-slate-500 text-[11px]">(${s.user_email})</span>
+                  <span class="px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 font-bold text-[10px]">${s.plan_name}</span>
+                </div>
+                <div class="text-slate-600 dark:text-slate-400 mt-0.5 text-[11px]">
+                  Ref: <span class="font-mono font-bold text-purple-600 dark:text-purple-400">${s.reference}</span> • Sender: <strong>${s.proof.sender_name || 'N/A'}</strong> (${s.proof.sender_bank || ''})
+                </div>
+              </div>
+              <div class="flex items-center gap-2 w-full sm:w-auto">
+                <button onclick="viewProof(${s.id})" class="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-300">
+                  View Proof
+                </button>
+                <button onclick="approveSubscription(${s.id})" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs">
+                  Approve
+                </button>
+                <button onclick="openDeclineSubModal(${s.id})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs">
+                  Decline
+                </button>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          list.innerHTML = '<div class="text-xs text-slate-500 py-3 text-center">No pending manual payments at the moment. All up to date!</div>';
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    // =========================================================================
+    // 2. Manage Users
+    // =========================================================================
+    async function loadAdminUsers() {
+      try {
+        const q = document.getElementById('crmUserSearch').value;
+        const res = await fetch(`/api/admin/users?search=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        gAllUsers = data.users || [];
+        
+        // Populate user select in grant sub modal
+        const grantUserSelect = document.getElementById('grantUserId');
+        if (grantUserSelect) {
+          grantUserSelect.innerHTML = gAllUsers.map(u => `<option value="${u.id}">${u.name} (${u.email})</option>`).join('');
+        }
+
+        const tbody = document.getElementById('crmUsersTableBody');
+        tbody.innerHTML = gAllUsers.map(u => `
+          <tr class="border-b border-slate-200 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-900/40">
+            <td class="p-3">
+              <strong class="text-slate-900 dark:text-white text-xs">${u.name}</strong>
+              <div class="text-slate-500 text-[11px]">${u.email} • ID #${u.id}</div>
+            </td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} font-bold text-[10px] uppercase">${u.role}</span>
+            </td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded-full ${u.is_active ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300'} font-bold text-[10px]">${u.is_active ? 'Active' : 'Disabled'}</span>
+            </td>
+            <td class="p-3">
+              <span class="font-bold text-brand-600 dark:text-brand-400">${u.plan_name || 'None'}</span>
+              <div class="text-[10px] text-slate-400 capitalize">${u.sub_status || 'Unsubscribed'}</div>
+            </td>
+            <td class="p-3">
+              <span class="uppercase text-[10px] font-bold ${u.bot_status === 'running' ? 'text-emerald-500' : 'text-slate-400'}">
+                <i class="fa-solid fa-circle text-[8px] mr-1 ${u.bot_status === 'running' ? 'text-emerald-500 animate-pulse' : 'text-slate-400'}"></i>
+                ${u.bot_status || 'STOPPED'}
+              </span>
+            </td>
+            <td class="p-3 text-right space-x-1 whitespace-nowrap">
+              <button onclick="openEditUserModal(${u.id})" title="Edit User Account" class="px-2.5 py-1.5 rounded-lg bg-brand-500 text-white font-bold text-xs hover:bg-brand-600 transition shadow-xs">
+                <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
+              </button>
+              <button onclick="impersonateUser(${u.id})" title="Open User Dashboard" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-700 dark:text-amber-300 hover:bg-amber-500/30 text-xs font-bold transition">
+                <i class="fa-solid fa-user-secret mr-1"></i> Login
+              </button>
+              <button onclick="toggleUserActive(${u.id}, ${u.is_active ? 0 : 1})" class="px-2 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 text-xs font-semibold">
+                ${u.is_active ? 'Disable' : 'Enable'}
+              </button>
+              <button onclick="deleteUser(${u.id})" class="px-2 py-1.5 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 hover:bg-rose-200 text-xs">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function openEditUserModal(userId) {
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`);
+        const data = await res.json();
+        if (!data.success || !data.user) {
+          showToast('Failed to fetch user details.', 'error');
+          return;
+        }
+        const u = data.user;
+        document.getElementById('editUserId').value = u.id;
+        document.getElementById('editUserName').value = u.name || '';
+        document.getElementById('editUserEmail').value = u.email || '';
+        document.getElementById('editUserRole').value = u.role || 'user';
+        document.getElementById('editUserActive').value = u.is_active !== undefined ? u.is_active : '1';
+        document.getElementById('editUserVerified').value = u.is_verified !== undefined ? u.is_verified : '1';
+        document.getElementById('editUserPassword').value = '';
+        document.getElementById('editUserPlanId').value = u.plan_id || '0';
+
+        document.getElementById('editUserModal').classList.remove('hidden');
+      } catch (e) { showToast('Error loading user.', 'error'); }
+    }
+
+    function impersonateCurrentUserModal() {
+      const uid = document.getElementById('editUserId').value;
+      if (uid) impersonateUser(Number(uid));
+    }
+
+    async function handleSaveEditUser(e) {
+      e.preventDefault();
+      const uid = Number(document.getElementById('editUserId').value);
+      const payload = {
+        user_id: uid,
+        name: document.getElementById('editUserName').value,
+        email: document.getElementById('editUserEmail').value,
+        role: document.getElementById('editUserRole').value,
+        is_active: Number(document.getElementById('editUserActive').value),
+        is_verified: Number(document.getElementById('editUserVerified').value),
+        password: document.getElementById('editUserPassword').value,
+        plan_id: Number(document.getElementById('editUserPlanId').value)
+      };
+
+      try {
+        const res = await fetch('/api/admin/users/update', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          closeModal('editUserModal');
+          loadAdminUsers();
+        } else {
+          showToast(data.error || 'Failed to update user', 'error');
+        }
+      } catch (err) { showToast('Network error updating user.', 'error'); }
+    }
+
+    async function impersonateUser(userId) {
+      if (!confirm('Log in as this user to view and test their account?')) return;
+      const res = await fetch('/api/auth/impersonate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: userId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message, 'success');
+        window.location.href = '/dashboard';
+      } else {
+        showToast(data.error || 'Could not log in as user.', 'error');
+      }
+    }
+
+    async function toggleUserActive(userId, newActive) {
+      await fetch('/api/admin/users/status', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: userId, is_active: newActive })
+      });
+      showToast(`User ${newActive ? 'activated' : 'deactivated'}.`, 'info');
+      loadAdminUsers();
+    }
+
+    async function deleteUser(userId) {
+      if (!confirm('Are you sure you want to permanently delete this user? This cannot be undone.')) return;
+      await fetch('/api/admin/users/delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: userId })
+      });
+      showToast('User deleted.', 'info');
+      loadAdminUsers();
+    }
+
+    // =========================================================================
+    // 3. Subscription Plans (With Channel Limits & Feature Matrix)
+    // =========================================================================
+    async function loadAdminPlans() {
+      try {
+        const res = await fetch('/api/admin/plans');
+        const data = await res.json();
+        gAllPlans = data.plans || [];
+        populatePlanDropdowns();
+
+        const list = document.getElementById('crmPlansList');
+        list.innerHTML = gAllPlans.map(p => {
+          const feats = Array.isArray(p.features) ? p.features : [];
+          return `
+            <div class="glass-card rounded-2xl p-5 border-slate-200 dark:border-slate-800 space-y-3.5 flex flex-col justify-between hover:border-brand-500/50 transition">
+              <div class="space-y-2">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="text-sm font-extrabold text-slate-900 dark:text-white">${p.name}</h4>
+                    <span class="text-[10px] font-mono text-slate-400">slug: ${p.slug}</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-base font-black text-brand-600 dark:text-brand-400">₦${Number(p.price).toLocaleString()}</span>
+                    <div class="text-[10px] text-slate-400">${p.duration_days} days</div>
+                  </div>
+                </div>
+
+                <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">${p.description || 'Full-featured Telegram mirroring plan.'}</p>
+
+                <!-- Channel Limit Badge -->
+                <div class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-500/30 flex items-center justify-between text-xs">
+                  <span class="font-extrabold text-purple-700 dark:text-purple-300">
+                    <i class="fa-solid fa-arrow-down-up-lock mr-1"></i> Limit:
+                  </span>
+                  <span class="px-2 py-0.5 rounded-lg bg-purple-600 text-white font-black text-[11px]">
+                    ${p.channel_limit >= 9999 ? 'Unlimited Channels' : `Max ${p.channel_limit} Source Channel(s)`}
+                  </span>
+                </div>
+
+                <!-- Features list -->
+                <div class="space-y-1 text-xs text-slate-600 dark:text-slate-300 pt-1">
+                  ${feats.slice(0, 5).map(f => `
+                    <div class="flex items-center gap-1.5 text-[11px]">
+                      <i class="fa-solid fa-circle-check text-emerald-500 text-[10px]"></i>
+                      <span class="truncate">${f}</span>
+                    </div>
+                  `).join('')}
+                  ${feats.length > 5 ? `<div class="text-[10px] text-slate-400 font-semibold pl-4">+${feats.length - 5} more features</div>` : ''}
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
+                <span class="text-[10px] px-2 py-0.5 rounded-full ${p.is_active ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'} font-bold">
+                  ${p.is_active ? 'Published' : 'Hidden'}
+                </span>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="openPlanModal(${p.id})" class="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-xs">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> Edit Plan
+                  </button>
+                  <button onclick="deletePlan(${p.id})" class="px-2.5 py-1.5 rounded-lg bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 hover:bg-rose-200 text-xs">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    function renderFeaturesMatrix(selectedFeatures = []) {
+      const container = document.getElementById('planFeaturesMatrix');
+      // Combine defaults with any custom features on this plan
+      const allFeatureItems = Array.from(new Set([...DEFAULT_APP_FUNCTIONS, ...selectedFeatures]));
+      
+      container.innerHTML = allFeatureItems.map(feat => {
+        const isChecked = selectedFeatures.includes(feat);
+        return `
+          <label class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 cursor-pointer hover:border-brand-500 transition">
+            <input type="checkbox" value="${feat}" ${isChecked ? 'checked' : ''} class="plan-feature-checkbox w-4 h-4 rounded text-brand-500">
+            <span class="truncate">${feat}</span>
+          </label>
+        `;
+      }).join('');
+    }
+
+    function setPlanChannelLimit(val) {
+      document.getElementById('planChannelLimit').value = val;
+    }
+
+    function addCustomPlanFeature() {
+      const input = document.getElementById('customFeatureInput');
+      const val = input.value.trim();
+      if (!val) return;
+      const container = document.getElementById('planFeaturesMatrix');
+      const newLabel = document.createElement('label');
+      newLabel.className = 'flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 cursor-pointer hover:border-brand-500 transition';
+      newLabel.innerHTML = `
+        <input type="checkbox" value="${val}" checked class="plan-feature-checkbox w-4 h-4 rounded text-brand-500">
+        <span class="truncate">${val}</span>
+      `;
+      container.appendChild(newLabel);
+      input.value = '';
+    }
+
+    function openPlanModal(planId = null) {
+      document.getElementById('planId').value = planId || '';
+      const title = document.getElementById('planModalTitle');
+
+      if (planId) {
+        title.innerHTML = '<i class="fa-solid fa-pen-to-square text-brand-500"></i> Edit Subscription Plan';
+        const plan = gAllPlans.find(p => p.id === planId);
+        if (plan) {
+          document.getElementById('planName').value = plan.name || '';
+          document.getElementById('planSlug').value = plan.slug || '';
+          document.getElementById('planDesc').value = plan.description || '';
+          document.getElementById('planPrice').value = plan.price || 0;
+          document.getElementById('planCurrency').value = plan.currency || 'NGN';
+          document.getElementById('planDuration').value = plan.duration_days || 30;
+          document.getElementById('planChannelLimit').value = plan.channel_limit || 3;
+          document.getElementById('planIsActive').checked = Boolean(plan.is_active);
+          renderFeaturesMatrix(Array.isArray(plan.features) ? plan.features : []);
+        }
+      } else {
+        title.innerHTML = '<i class="fa-solid fa-plus text-brand-500"></i> Create New Subscription Plan';
+        document.getElementById('planName').value = '';
+        document.getElementById('planSlug').value = '';
+        document.getElementById('planDesc').value = '';
+        document.getElementById('planPrice').value = 15000;
+        document.getElementById('planCurrency').value = 'NGN';
+        document.getElementById('planDuration').value = 30;
+        document.getElementById('planChannelLimit').value = 3;
+        document.getElementById('planIsActive').checked = true;
+        renderFeaturesMatrix(DEFAULT_APP_FUNCTIONS.slice(0, 8));
+      }
+
+      document.getElementById('planModal').classList.remove('hidden');
+    }
+
+    async function handleSavePlan(e) {
+      e.preventDefault();
+      const planIdVal = document.getElementById('planId').value;
+      const features = Array.from(document.querySelectorAll('.plan-feature-checkbox:checked')).map(cb => cb.value);
+
+      const payload = {
+        name: document.getElementById('planName').value.trim(),
+        slug: document.getElementById('planSlug').value.trim(),
+        description: document.getElementById('planDesc').value.trim(),
+        price: parseFloat(document.getElementById('planPrice').value) || 0,
+        currency: document.getElementById('planCurrency').value,
+        duration_days: parseInt(document.getElementById('planDuration').value) || 30,
+        channel_limit: parseInt(document.getElementById('planChannelLimit').value) || 1,
+        features: features,
+        is_active: document.getElementById('planIsActive').checked ? 1 : 0
+      };
+
+      if (planIdVal) {
+        payload.id = parseInt(planIdVal);
+      }
+
+      try {
+        const res = await fetch('/api/admin/plans/save', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          closeModal('planModal');
+          loadAdminPlans();
+        } else {
+          showToast(data.error || 'Failed to save plan.', 'error');
+        }
+      } catch (err) { showToast('Network error saving plan.', 'error'); }
+    }
+
+    async function deletePlan(planId) {
+      if (!confirm('Are you sure you want to delete this subscription plan?')) return;
+      await fetch('/api/admin/plans/delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ plan_id: planId })
+      });
+      showToast('Plan deleted.', 'info');
+      loadAdminPlans();
+    }
+
+    // =========================================================================
+    // 4. Payment Gateways
+    // =========================================================================
+    async function loadAdminPaymentMethods() {
+      try {
+        const res = await fetch('/api/admin/payment-methods');
+        const data = await res.json();
+        const s = data.settings || {};
+
+        document.getElementById('admPaystackEnabled').checked = s.paystack_enabled === '1' || s.paystack_enabled === 'true';
+        document.getElementById('admPaystackPub').value = s.paystack_public_key || '';
+        document.getElementById('admPaystackSec').value = s.paystack_secret_key || '';
+
+        document.getElementById('admKorapayEnabled').checked = s.korapay_enabled === '1' || s.korapay_enabled === 'true';
+        document.getElementById('admKorapayPub').value = s.korapay_public_key || '';
+        document.getElementById('admKorapaySec').value = s.korapay_secret_key || '';
+
+        document.getElementById('admOpayEnabled').checked = s.opay_enabled === '1' || s.opay_enabled === 'true';
+        document.getElementById('admOpayMerchant').value = s.opay_merchant_id || '';
+        document.getElementById('admOpaySec').value = s.opay_secret_key || '';
+
+        document.getElementById('admPalmpayEnabled').checked = s.palmpay_enabled === '1' || s.palmpay_enabled === 'true';
+        document.getElementById('admPalmpayAppId').value = s.palmpay_app_id || '';
+        document.getElementById('admPalmpaySec').value = s.palmpay_secret_key || '';
+
+        document.getElementById('admManualEnabled').checked = s.manual_payment_enabled !== '0';
+        document.getElementById('admBankName').value = s.manual_bank_name || '';
+        document.getElementById('admAccountNum').value = s.manual_account_number || '';
+        document.getElementById('admAccountName').value = s.manual_account_name || '';
+        document.getElementById('admManualInstructions').value = s.manual_instructions || '';
+      } catch (e) { console.error(e); }
+    }
+
+    async function handleSavePaymentKeys(e) {
+      e.preventDefault();
+      try {
+        const payload = {
+          paystack_enabled: document.getElementById('admPaystackEnabled').checked ? '1' : '0',
+          paystack_public_key: document.getElementById('admPaystackPub').value.trim(),
+          paystack_secret_key: document.getElementById('admPaystackSec').value.trim(),
+          korapay_enabled: document.getElementById('admKorapayEnabled').checked ? '1' : '0',
+          korapay_public_key: document.getElementById('admKorapayPub').value.trim(),
+          korapay_secret_key: document.getElementById('admKorapaySec').value.trim(),
+          opay_enabled: document.getElementById('admOpayEnabled').checked ? '1' : '0',
+          opay_merchant_id: document.getElementById('admOpayMerchant').value.trim(),
+          opay_secret_key: document.getElementById('admOpaySec').value.trim(),
+          palmpay_enabled: document.getElementById('admPalmpayEnabled').checked ? '1' : '0',
+          palmpay_app_id: document.getElementById('admPalmpayAppId').value.trim(),
+          palmpay_secret_key: document.getElementById('admPalmpaySec').value.trim(),
+          manual_payment_enabled: document.getElementById('admManualEnabled').checked ? '1' : '0',
+          manual_bank_name: document.getElementById('admBankName').value.trim(),
+          manual_account_number: document.getElementById('admAccountNum').value.trim(),
+          manual_account_name: document.getElementById('admAccountName').value.trim(),
+          manual_instructions: document.getElementById('admManualInstructions').value.trim()
+        };
+        const res = await fetch('/api/admin/payment-methods/save', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) showToast(data.message, 'success');
+        else showToast(data.error || 'Failed to save payment keys.', 'error');
+      } catch (err) { showToast('Error saving payment keys.', 'error'); }
+    }
+
+    // =========================================================================
+    // 5. Subscriptions History & Approvals
+    // =========================================================================
+    let gSubFilter = 'all';
+
+    function filterSubs(status) {
+      gSubFilter = status;
+      document.querySelectorAll('.subs-filter-btn').forEach(b => {
+        if (b.dataset.filter === status) {
+          b.className = 'subs-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-500 text-white';
+        } else {
+          b.className = 'subs-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900';
+        }
+      });
+      renderSubscriptionsTable();
+    }
+
+    async function loadAdminSubscriptions() {
+      try {
+        const res = await fetch('/api/admin/subscriptions?status=all');
+        const data = await res.json();
+        gAllSubs = data.subscriptions || [];
+        renderSubscriptionsTable();
+      } catch (e) { console.error(e); }
+    }
+
+    function renderSubscriptionsTable() {
+      const tbody = document.getElementById('crmSubsTableBody');
+      const filtered = gSubFilter === 'all' ? gAllSubs : gAllSubs.filter(s => s.status === gSubFilter);
+      tbody.innerHTML = filtered.map(s => `
+        <tr class="border-b border-slate-200 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-900/40">
+          <td class="p-3">
+            <strong class="text-slate-900 dark:text-white">${s.user_name}</strong>
+            <div class="text-slate-500 text-[11px]">${s.user_email}</div>
+          </td>
+          <td class="p-3 font-semibold text-brand-600 dark:text-brand-400">
+            ${s.plan_name || 'N/A'}
+          </td>
+          <td class="p-3 uppercase text-[10px] font-mono font-bold">${s.payment_method}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded-full ${s.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : s.status === 'pending' ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300' : 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300'} font-bold text-[10px] uppercase">
+              ${s.status}
+            </span>
+          </td>
+          <td class="p-3 text-slate-500 text-[11px]">${s.start_date || 'N/A'}</td>
+          <td class="p-3 text-slate-500 text-[11px]">${s.end_date || 'N/A'}</td>
+          <td class="p-3 text-right whitespace-nowrap space-x-1">
+            ${s.payment_method === 'manual' || s.proof && Object.keys(s.proof).length ? `
+              <button onclick="viewProof(${s.id})" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-[10px]">Proof</button>
+            ` : ''}
+            ${s.status === 'pending' ? `
+              <button onclick="approveSubscription(${s.id})" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[10px]">Approve</button>
+              <button onclick="openDeclineSubModal(${s.id})" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold text-[10px]">Decline</button>
+            ` : ''}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openGrantSubModal() {
+      document.getElementById('grantSubModal').classList.remove('hidden');
+    }
+
+    async function handleGrantSubscription(e) {
+      e.preventDefault();
+      const payload = {
+        user_id: parseInt(document.getElementById('grantUserId').value),
+        plan_id: parseInt(document.getElementById('grantPlanId').value),
+        duration_days: parseInt(document.getElementById('grantDurationDays').value) || 30
+      };
+      try {
+        const res = await fetch('/api/admin/subscriptions/grant', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          closeModal('grantSubModal');
+          loadAdminSubscriptions();
+          loadAdminAnalytics();
+        } else {
+          showToast(data.error || 'Failed to grant subscription.', 'error');
+        }
+      } catch (err) { showToast('Error granting subscription.', 'error'); }
+    }
+
+    function viewProof(subId) {
+      const sub = gAllSubs.find(s => s.id === subId) || (gAllUsers.length ? { id: subId, proof: {} } : null);
+      if (!sub) return;
+
+      const p = sub.proof || {};
+      const container = document.getElementById('proofModalContent');
+      container.innerHTML = `
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2">
+          <div><strong>User:</strong> ${sub.user_name || 'N/A'} (${sub.user_email || ''})</div>
+          <div><strong>Plan:</strong> ${sub.plan_name || 'N/A'} • <strong>Amount:</strong> ₦${Number(sub.amount || 0).toLocaleString()}</div>
+          <div><strong>Reference:</strong> <span class="font-mono text-purple-600 dark:text-purple-400 font-bold">${sub.reference || 'N/A'}</span></div>
+          <div><strong>Sender Account Name:</strong> ${p.sender_name || 'Not provided'}</div>
+          <div><strong>Sender Bank:</strong> ${p.sender_bank || 'Not provided'}</div>
+          <div><strong>Payment Date:</strong> ${p.payment_date || 'N/A'}</div>
+          ${p.notes ? `<div><strong>Notes:</strong> ${p.notes}</div>` : ''}
+        </div>
+      `;
+
+      const actions = document.getElementById('proofModalActions');
+      if (sub.status === 'pending') {
+        actions.innerHTML = `
+          <button onclick="closeModal('viewProofModal')" class="px-3 py-1.5 rounded-lg text-slate-500 font-semibold">Close</button>
+          <button onclick="approveSubscription(${sub.id}); closeModal('viewProofModal')" class="px-4 py-1.5 rounded-lg bg-emerald-600 text-white font-bold">Approve Payment</button>
+          <button onclick="closeModal('viewProofModal'); openDeclineSubModal(${sub.id})" class="px-4 py-1.5 rounded-lg bg-rose-600 text-white font-bold">Decline Payment</button>
+        `;
+      } else {
+        actions.innerHTML = `
+          <button onclick="closeModal('viewProofModal')" class="px-4 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold">Close</button>
+        `;
+      }
+
+      document.getElementById('viewProofModal').classList.remove('hidden');
+    }
+
+    async function approveSubscription(subId) {
+      const res = await fetch('/api/admin/subscriptions/approve', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ subscription_id: subId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message, 'success');
+        loadAdminAnalytics();
+        loadAdminSubscriptions();
+      }
+    }
+
+    let gDecliningSubId = null;
+    function openDeclineSubModal(subId) {
+      gDecliningSubId = subId;
+      const reason = prompt('Reason for declining this manual payment:') || 'Payment not reflected on bank statement.';
+      if (reason) declineSubscription(subId, reason);
+    }
+
+    async function declineSubscription(subId, reason) {
+      const res = await fetch('/api/admin/subscriptions/decline', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ subscription_id: subId, reason })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Subscription declined.', 'info');
+        loadAdminAnalytics();
+        loadAdminSubscriptions();
+      }
+    }
+
+    // =========================================================================
+    // 6. Transactions History
+    // =========================================================================
+    async function loadAdminTransactions() {
+      try {
+        const res = await fetch('/api/admin/transactions');
+        const data = await res.json();
+        gAllTx = data.transactions || [];
+        renderTransactionsTable(gAllTx);
+      } catch (e) { console.error(e); }
+    }
+
+    function renderTransactionsTable(txList) {
+      const tbody = document.getElementById('crmTxTableBody');
+      tbody.innerHTML = txList.map(t => `
+        <tr class="border-b border-slate-200 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-900/40 text-[11px]">
+          <td class="p-3 font-mono font-bold text-purple-600 dark:text-purple-400">${t.reference}</td>
+          <td class="p-3 text-slate-900 dark:text-white font-sans">${t.user_name || 'N/A'}</td>
+          <td class="p-3 font-semibold text-brand-600 dark:text-brand-400 font-sans">${t.plan_name || 'N/A'}</td>
+          <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400">₦${Number(t.amount).toLocaleString()}</td>
+          <td class="p-3 uppercase font-mono font-semibold">${t.payment_method}</td>
+          <td class="p-3 uppercase font-bold ${t.status === 'success' ? 'text-emerald-500' : 'text-amber-500'}">${t.status}</td>
+          <td class="p-3 text-slate-500">${t.created_at}</td>
+          <td class="p-3 text-right">
+            <button onclick="viewTxDetail(${t.id})" class="px-2 py-1 rounded bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold hover:bg-brand-500 hover:text-white">
+              Details
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterTransactions() {
+      const q = document.getElementById('crmTxSearch').value.toLowerCase();
+      const filtered = gAllTx.filter(t => (t.reference && t.reference.toLowerCase().includes(q)) || (t.user_name && t.user_name.toLowerCase().includes(q)));
+      renderTransactionsTable(filtered);
+    }
+
+    function viewTxDetail(txId) {
+      const t = gAllTx.find(x => x.id === txId);
+      if (!t) return;
+      const container = document.getElementById('txDetailContent');
+      container.innerHTML = `
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2">
+          <div><strong>Reference:</strong> <span class="font-mono text-purple-500 font-bold">${t.reference}</span></div>
+          <div><strong>User:</strong> ${t.user_name} (${t.user_email})</div>
+          <div><strong>Plan:</strong> ${t.plan_name || 'N/A'}</div>
+          <div><strong>Amount:</strong> ₦${Number(t.amount).toLocaleString()} ${t.currency}</div>
+          <div><strong>Payment Method:</strong> ${t.payment_method}</div>
+          <div><strong>Status:</strong> <span class="uppercase font-bold text-emerald-500">${t.status}</span></div>
+          <div><strong>Date:</strong> ${t.created_at}</div>
+          ${t.gateway_response ? `<div><strong>Gateway Response:</strong> <pre class="p-2 bg-slate-900 text-slate-300 rounded font-mono text-[10px] mt-1 whitespace-pre-wrap">${t.gateway_response}</pre></div>` : ''}
+        </div>
+      `;
+      document.getElementById('txDetailModal').classList.remove('hidden');
+    }
+
+    // =========================================================================
+    // 7. Newsletter Marketing
+    // =========================================================================
+    let gAllNewsletters = [];
+
+    async function loadAdminNewsletters() {
+      try {
+        const res = await fetch('/api/admin/newsletter');
+        const data = await res.json();
+        gAllNewsletters = data.subscribers || [];
+        document.getElementById('crmNewsletterCount').innerText = gAllNewsletters.length;
+
+        const tbody = document.getElementById('crmNewsletterTableBody');
+        tbody.innerHTML = gAllNewsletters.map(s => `
+          <tr class="border-b border-slate-200 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-900/40">
+            <td class="p-3 font-semibold text-slate-900 dark:text-white">${s.email}</td>
+            <td class="p-3">${s.user_id ? `<span class="px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 font-bold text-[10px]">User #${s.user_id}</span>` : '<span class="text-slate-400 text-[10px]">Visitor Lead</span>'}</td>
+            <td class="p-3 text-slate-500 text-[11px]">${s.created_at}</td>
+            <td class="p-3 text-right">
+              <button onclick="deleteNewsletterSubscriber(${s.id})" class="px-2 py-1 rounded bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 hover:bg-rose-200 text-xs">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    function openAddNewsletterModal() {
+      document.getElementById('newSubscriberEmail').value = '';
+      document.getElementById('addNewsletterModal').classList.remove('hidden');
+    }
+
+    async function handleAddNewsletter(e) {
+      e.preventDefault();
+      const email = document.getElementById('newSubscriberEmail').value.trim();
+      try {
+        const res = await fetch('/api/admin/newsletter/add', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          closeModal('addNewsletterModal');
+          loadAdminNewsletters();
+        } else {
+          showToast(data.error || 'Failed to add subscriber', 'error');
+        }
+      } catch (err) { showToast('Network error adding subscriber.', 'error'); }
+    }
+
+    async function deleteNewsletterSubscriber(id) {
+      if (!confirm('Remove subscriber from newsletter leads?')) return;
+      await fetch('/api/admin/newsletter/delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ subscriber_id: id })
+      });
+      showToast('Subscriber removed.', 'info');
+      loadAdminNewsletters();
+    }
+
+    function exportNewsletterCSV() {
+      if (!gAllNewsletters.length) {
+        showToast('No newsletter leads to export.', 'info');
+        return;
+      }
+      let csv = 'ID,Email,UserID,CreatedDate\n';
+      gAllNewsletters.forEach(s => {
+        csv += `${s.id},"${s.email}",${s.user_id || ''},"${s.created_at}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `telemirror_newsletter_leads_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    }
+
+    function composeNewsletterBroadcast() {
+      switchAdminTab('crmMessageCenter');
+      document.getElementById('msgRecipientType').value = 'newsletter';
+      toggleRecipientIdInput();
+    }
+
+    // =========================================================================
+    // 8. Message Center
+    // =========================================================================
+    function toggleRecipientIdInput() {
+      const type = document.getElementById('msgRecipientType').value;
+      const group = document.getElementById('msgRecipientIdGroup');
+      if (type === 'single') {
+        group.classList.remove('hidden');
+      } else {
+        group.classList.add('hidden');
+      }
+    }
+
+    const MESSAGE_TEMPLATES = {
+      maintenance: {
+        subject: "Scheduled System Maintenance Notice • TeleMirror Pro",
+        body: "Hello,\n\nPlease be informed that our core server infrastructure will undergo scheduled maintenance tonight at 02:00 UTC for approximately 30 minutes. All active bot workers will resume mirroring automatically after the maintenance is completed.\n\nThank you for choosing TeleMirror Pro!"
+      },
+      promo: {
+        subject: "Special 20% Upgrade Discount • Boost Your Mirroring Channels",
+        body: "Exciting news!\n\nUpgrade your TeleMirror Pro subscription this week and enjoy 20% OFF all Pro and Enterprise tiers. Mirror up to 10 source channels simultaneously with zero delay and instant album cloning.\n\nVisit your Dashboard to upgrade today!"
+      },
+      features: {
+        subject: "New Feature Released: Interactive Message Customizer & Rules",
+        body: "We are thrilled to announce our latest upgrade! You can now configure dynamic replacement rules, remove promotional watermarks, and auto-inject custom headers and footers with a single click.\n\nLog in now to experience TeleMirror!"
+      },
+      welcome: {
+        subject: "Welcome to TeleMirror • Getting Started",
+        body: "Welcome to TeleMirror Pro!\n\nTo begin forwarding messages, simply open your user dashboard, configure your source channels and target channels, and click 'Start Bot'. Need help? Reach out to our 24/7 support desk anytime.\n\nHappy mirroring!"
+      }
+    };
+
+    function applyMessageTemplate(key) {
+      if (!key || !MESSAGE_TEMPLATES[key]) return;
+      document.getElementById('msgSubject').value = MESSAGE_TEMPLATES[key].subject;
+      document.getElementById('msgBody').value = MESSAGE_TEMPLATES[key].body;
+    }
+
+    async function handleSendBroadcast(e) {
+      e.preventDefault();
+      try {
+        const payload = {
+          recipient_type: document.getElementById('msgRecipientType').value,
+          recipient_ids: document.getElementById('msgRecipientId').value ? [Number(document.getElementById('msgRecipientId').value)] : [],
+          subject: document.getElementById('msgSubject').value.trim(),
+          body: document.getElementById('msgBody').value.trim()
+        };
+        const res = await fetch('/api/admin/message-center/send', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          document.getElementById('msgSubject').value = '';
+          document.getElementById('msgBody').value = '';
+          loadAdminMessageLogs();
+        } else {
+          showToast(data.error || 'Failed to dispatch broadcast', 'error');
+        }
+      } catch (err) { showToast('Error sending broadcast.', 'error'); }
+    }
+
+    async function loadAdminMessageLogs() {
+      try {
+        const res = await fetch('/api/admin/message-center/logs');
+        const data = await res.json();
+        const tbody = document.getElementById('crmMessageLogsBody');
+        const logs = data.logs || [];
+        if (!logs.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-500">No broadcasts sent yet.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = logs.map(l => {
+          const recCount = l.recipient_emails ? l.recipient_emails.split(',').filter(Boolean).length : 0;
+          return `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/40">
+              <td class="p-2.5 text-slate-500 font-mono text-[10px]">${l.created_at}</td>
+              <td class="p-2.5 font-bold text-slate-900 dark:text-white">${l.subject}</td>
+              <td class="p-2.5 uppercase text-[10px] text-purple-600 dark:text-purple-400 font-bold">${l.recipient_type}</td>
+              <td class="p-2.5 font-bold text-brand-500">${recCount} user(s)</td>
+              <td class="p-2.5"><span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] uppercase">${l.status}</span></td>
+            </tr>
+          `;
+        }).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    // =========================================================================
+    // 9. Support Desk & Real-Time Chat
+    // =========================================================================
+    let gTicketFilter = 'all';
+
+    function filterTickets(status) {
+      gTicketFilter = status;
+      document.querySelectorAll('.ticket-filter-btn').forEach(b => {
+        if (b.dataset.filter === status) {
+          b.className = 'ticket-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-500 text-white';
+        } else {
+          b.className = 'ticket-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900';
+        }
+      });
+      loadAdminTickets();
+    }
+
+    async function loadAdminTickets() {
+      try {
+        const res = await fetch(`/api/admin/tickets?status=${gTicketFilter}`);
+        const data = await res.json();
+        const list = document.getElementById('crmTicketsList');
+        const tickets = data.tickets || [];
+        if (!tickets.length) {
+          list.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center text-slate-500 text-xs">No support tickets found matching this filter.</div>';
+          return;
+        }
+
+        list.innerHTML = tickets.map(t => `
+          <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800 space-y-2.5 hover:border-brand-500/40 transition">
+            <div class="flex justify-between items-start">
+              <div>
+                <strong class="text-sm font-bold text-slate-900 dark:text-white">${t.subject}</strong>
+                <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  From: <strong>${t.user_name}</strong> (${t.user_email}) • Priority: <span class="capitalize font-bold text-amber-500">${t.priority}</span>
+                </div>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full ${t.status === 'open' ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300' : t.status === 'resolved' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'} font-bold uppercase">
+                ${t.status}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-500 pt-1">
+              <span><i class="fa-solid fa-comments mr-1"></i> ${t.message_count} messages</span>
+              <button onclick="openTicketChatModal(${t.id})" class="px-3.5 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-reply"></i> Open Chat
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function openTicketChatModal(ticketId) {
+      document.getElementById('chatTicketId').value = ticketId;
+      try {
+        const res = await fetch(`/api/admin/tickets/${ticketId}`);
+        const data = await res.json();
+        if (!data.success || !data.ticket) {
+          showToast('Failed to load ticket.', 'error');
+          return;
+        }
+        const t = data.ticket;
+        document.getElementById('chatTicketSubject').innerText = `#${t.id}: ${t.subject}`;
+        document.getElementById('chatTicketUser').innerText = `User: ${t.user_name} (${t.user_email}) • Priority: ${t.priority.toUpperCase()}`;
+        document.getElementById('chatTicketStatusBadge').innerText = t.status;
+        document.getElementById('chatTicketStatusBadge').className = `text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${t.status === 'open' ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'}`;
+        document.getElementById('chatTicketStatusSelect').value = t.status;
+
+        const messagesBox = document.getElementById('adminTicketMessages');
+        const msgs = t.messages || [];
+        messagesBox.innerHTML = msgs.map(m => {
+          const isAdmin = m.sender_role === 'admin';
+          return `
+            <div class="flex ${isAdmin ? 'justify-end' : 'justify-start'}">
+              <div class="max-w-[80%] rounded-2xl p-3 ${isAdmin ? 'bg-purple-600 text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-none border border-slate-200 dark:border-slate-700'} space-y-1 shadow-sm">
+                <div class="flex items-center gap-1.5 text-[10px] ${isAdmin ? 'text-purple-200' : 'text-slate-400'}">
+                  <strong>${isAdmin ? 'TeleMirror Support (Admin)' : m.sender_name || 'User'}</strong>
+                  <span>• ${m.created_at || ''}</span>
+                </div>
+                <div class="text-xs whitespace-pre-wrap">${m.message}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('chatReplyInput').value = '';
+        document.getElementById('adminTicketChatModal').classList.remove('hidden');
+        setTimeout(() => { messagesBox.scrollTop = messagesBox.scrollHeight; }, 50);
+      } catch (e) { showToast('Error opening ticket chat.', 'error'); }
+    }
+
+    async function sendAdminTicketReply(e) {
+      e.preventDefault();
+      const tid = Number(document.getElementById('chatTicketId').value);
+      const msg = document.getElementById('chatReplyInput').value.trim();
+      const status = document.getElementById('chatTicketStatusSelect').value;
+
+      try {
+        const res = await fetch('/api/admin/tickets/reply', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ ticket_id: tid, message: msg, status: status })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Reply dispatched!', 'success');
+          openTicketChatModal(tid);
+          loadAdminTickets();
+        } else {
+          showToast(data.error || 'Failed to dispatch reply', 'error');
+        }
+      } catch (err) { showToast('Error sending reply.', 'error'); }
+    }
+
+    // =========================================================================
+    // 10. Giveaways
+    // =========================================================================
+    async function loadAdminGiveaways() {
+      try {
+        const res = await fetch('/api/admin/giveaways');
+        const data = await res.json();
+        const list = document.getElementById('crmGiveawaysList');
+        const giveaways = data.giveaways || [];
+        if (!giveaways.length) {
+          list.innerHTML = '<div class="glass-card rounded-2xl p-6 text-center text-slate-500 text-xs sm:col-span-2">No active giveaways created yet.</div>';
+          return;
+        }
+
+        list.innerHTML = giveaways.map(g => `
+          <div class="glass-card rounded-2xl p-4 border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between hover:border-brand-500/40 transition">
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-brand-600 dark:text-brand-400 font-mono font-black text-sm uppercase px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950/60 border border-brand-500/30">${g.code}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full ${g.is_active ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'} font-bold">
+                  ${g.is_active ? 'Active' : 'Paused'}
+                </span>
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 dark:text-white">${g.title}</h4>
+              <div class="text-xs text-slate-500 dark:text-slate-400 space-y-0.5">
+                <div>Plan: <strong class="text-purple-600 dark:text-purple-400">${g.plan_name}</strong> (${g.duration_days} days)</div>
+                <div>Target: <span class="capitalize font-semibold">${g.target_type}</span> • Claims: <strong>${g.claims_count}</strong> / ${g.max_claims > 0 ? g.max_claims : 'Unlimited'}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+              <button onclick="toggleGiveaway(${g.id}, ${g.is_active ? 0 : 1})" class="px-2.5 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:text-slate-900">
+                ${g.is_active ? 'Pause' : 'Activate'}
+              </button>
+              <button onclick="deleteGiveaway(${g.id})" class="px-2.5 py-1.5 rounded-lg bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 hover:bg-rose-200 text-xs">
+                <i class="fa-solid fa-trash mr-1"></i> Delete
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    function openCreateGiveawayModal() {
+      document.getElementById('giveawayCode').value = '';
+      document.getElementById('giveawayTitle').value = '';
+      document.getElementById('giveawayDuration').value = '7';
+      document.getElementById('giveawayMaxClaims').value = '50';
+      document.getElementById('createGiveawayModal').classList.remove('hidden');
+    }
+
+    async function handleCreateGiveaway(e) {
+      e.preventDefault();
+      const payload = {
+        code: document.getElementById('giveawayCode').value.trim().toUpperCase(),
+        title: document.getElementById('giveawayTitle').value.trim(),
+        plan_id: parseInt(document.getElementById('giveawayPlanId').value),
+        duration_days: parseInt(document.getElementById('giveawayDuration').value) || 7,
+        target_type: document.getElementById('giveawayTarget').value,
+        max_claims: parseInt(document.getElementById('giveawayMaxClaims').value) || 0
+      };
+
+      try {
+        const res = await fetch('/api/admin/giveaways/create', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          closeModal('createGiveawayModal');
+          loadAdminGiveaways();
+        } else {
+          showToast(data.error || 'Failed to create giveaway.', 'error');
+        }
+      } catch (err) { showToast('Error creating giveaway.', 'error'); }
+    }
+
+    async function toggleGiveaway(gid, newActive) {
+      await fetch('/api/admin/giveaways/toggle', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ giveaway_id: gid, is_active: newActive })
+      });
+      loadAdminGiveaways();
+    }
+
+    async function deleteGiveaway(gid) {
+      if (!confirm('Permanently delete this giveaway campaign?')) return;
+      await fetch('/api/admin/giveaways/delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ giveaway_id: gid })
+      });
+      showToast('Giveaway deleted.', 'info');
+      loadAdminGiveaways();
+    }
+
+    // =========================================================================
+    // 11. Site Settings & Logs
+    // =========================================================================
+    async function loadAdminSettings() {
+      try {
+        const res = await fetch('/api/admin/settings');
+        const data = await res.json();
+        const s = data.settings || {};
+        document.getElementById('setSiteName').value = s.site_name || 'TeleMirror';
+        document.getElementById('setTgSupport').value = s.telegram_support_channel || 'https://t.me/telemirror_support';
+        document.getElementById('setSupportEmail').value = s.support_email || 'support@telemirror.com';
+        document.getElementById('setAdminPhone').value = s.admin_phone || '';
+        document.getElementById('setMaintenance').value = s.maintenance_mode || '0';
+        document.getElementById('setAllowRegistration').value = s.allow_registration || '1';
+        document.getElementById('setSeoTitle').value = s.seo_title || 'TeleMirror • Ultimate Telegram Channel Forwarding & Cloner';
+        document.getElementById('setSeoKeywords').value = s.seo_keywords || 'telegram mirror, channel cloner, message forwarder';
+        document.getElementById('setSeoDesc').value = s.seo_description || 'High-performance Telegram mirroring engine with real-time text replacer, link stripper, album cloning, and 24/7 web logs.';
+        document.getElementById('setSmtpHost').value = s.smtp_host || '';
+        document.getElementById('setSmtpPort').value = s.smtp_port || '587';
+        document.getElementById('setSmtpUser').value = s.smtp_user || '';
+      } catch (e) { console.error(e); }
+    }
+
+    async function handleSaveSiteSettings(e) {
+      e.preventDefault();
+      try {
+        const payload = {
+          site_name: document.getElementById('setSiteName').value.trim(),
+          telegram_support_channel: document.getElementById('setTgSupport').value.trim(),
+          support_email: document.getElementById('setSupportEmail').value.trim(),
+          admin_phone: document.getElementById('setAdminPhone').value.trim(),
+          maintenance_mode: document.getElementById('setMaintenance').value,
+          allow_registration: document.getElementById('setAllowRegistration').value,
+          seo_title: document.getElementById('setSeoTitle').value.trim(),
+          seo_keywords: document.getElementById('setSeoKeywords').value.trim(),
+          seo_description: document.getElementById('setSeoDesc').value.trim(),
+          smtp_host: document.getElementById('setSmtpHost').value.trim(),
+          smtp_port: document.getElementById('setSmtpPort').value.trim(),
+          smtp_user: document.getElementById('setSmtpUser').value.trim()
+        };
+        const res = await fetch('/api/admin/settings/save', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) showToast('Site settings updated!', 'success');
+        else showToast(data.error || 'Failed to save settings.', 'error');
+      } catch (err) { showToast('Error saving settings.', 'error'); }
+    }
+
+    async function loadAdminLogs() {
+      try {
+        const res = await fetch('/api/admin/logs');
+        const data = await res.json();
+        const tbody = document.getElementById('crmLogsBody');
+        const logs = data.logs || [];
+        if (!logs.length) {
+          tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-500 font-sans">No audit records logged yet.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = logs.map(l => `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/40">
+            <td class="p-2.5 text-slate-400">${l.created_at}</td>
+            <td class="p-2.5 text-slate-900 dark:text-white">${l.user_name || 'System'}</td>
+            <td class="p-2.5 font-bold text-brand-600 dark:text-brand-400">${l.action}</td>
+            <td class="p-2.5 text-slate-500 dark:text-slate-400 whitespace-pre-wrap">${l.details || ''}</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function clearAuditLogs() {
+      if (!confirm('Are you sure you want to clear all system audit logs?')) return;
+      try {
+        const res = await fetch('/api/admin/logs/clear', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'}
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          loadAdminLogs();
+        }
+      } catch (e) { showToast('Error clearing logs.', 'error'); }
+    }
+  </script>
+</body>
+</html>
